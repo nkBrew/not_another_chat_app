@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "incremental": true
+  },
+  "include": ["src/**/*.ts", "environment.d.ts"],
+  "exclude": ["node_modules"],
+  "ts-node": {
+    //Allows ts-node not to break when compiling
+    "compilerOptions": {
+      "module": "CommonJS"
+    },
+    //Allows compiling environment files with nodemon/tsnode
+    "files": true
+  }
+}
