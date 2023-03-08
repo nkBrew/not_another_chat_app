@@ -13,3 +13,6 @@ GET http://localhost:3001/test
 
 ###
 GET http://localhost:3001/logout
+
+###
+GET http://localhost:3001/test

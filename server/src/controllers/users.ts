@@ -17,7 +17,6 @@ export const postLogin = async (
     (err: Error, user: User, info: IVerifyOptions) => {
       if (err) {
         console.log(err);
-        console.log('milk');
         return next(err);
       }
       if (!user) {
@@ -30,7 +29,7 @@ export const postLogin = async (
         if (err) {
           return next(err);
         }
-        return res.send();
+        return res.send({ userId: user.id, email: user.email });
       });
     },
   )(req, res, next);

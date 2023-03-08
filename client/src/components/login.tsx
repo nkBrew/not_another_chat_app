@@ -2,7 +2,11 @@
 import { login } from '@/apis/backend';
 import React, { useState } from 'react';
 
-const Login = () => {
+interface LoginProps {
+  setUser: (user: { userId: string; email: string }) => void;
+}
+
+const Login = ({ setUser }: LoginProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -11,7 +15,10 @@ const Login = () => {
     console.log(email);
     console.log(password);
     login(email, password)
-      .then(() => console.log('yay'))
+      .then((data) => {
+        console.log(data);
+        setUser(data);
+      })
       .catch((reason) => console.log(reason));
   };
 
