@@ -1,31 +1,12 @@
-'use client';
-import React, { useState } from 'react';
 import useSocketStore from '@/store/store';
-
-export interface ModalProps {
-  show: boolean;
-  setShow: (show: boolean) => void;
-  // submit: (roomName: string) => void;
-}
-
-const CreateRoomModal = ({ show, setShow }: ModalProps) => {
+import React, { useState } from 'react';
+import { ModalProps } from './createRoom';
+const JoinRoomModal = ({ show, setShow }: ModalProps) => {
   const [roomName, setRoomName] = useState('');
-  const [error, setError] = useState('');
   const socket = useSocketStore((state) => state.socket);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    socket?.emit('createRoom', roomName, (response) => {
-      const { status } = response;
-      if (status !== 'ok') {
-        // setError()
-        console.log('room already exists');
-        return;
-      }
-      setShow(false);
-    });
   };
-
   return (
     <>
       {show && (
@@ -59,4 +40,4 @@ const CreateRoomModal = ({ show, setShow }: ModalProps) => {
   );
 };
 
-export default CreateRoomModal;
+export default JoinRoomModal;

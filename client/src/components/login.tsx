@@ -1,5 +1,6 @@
 'use client';
 import { login } from '@/apis/backend';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface LoginProps {
@@ -9,7 +10,7 @@ interface LoginProps {
 const Login = ({ setUser }: LoginProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const router = useRouter();
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(email);
@@ -18,6 +19,7 @@ const Login = ({ setUser }: LoginProps) => {
       .then((data) => {
         console.log(data);
         setUser(data);
+        router.push('/rooms');
       })
       .catch((reason) => console.log(reason));
   };

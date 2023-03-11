@@ -33,9 +33,16 @@ interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
 }
 
+interface SocketIOResponse {
+  status: string;
+}
+
 interface ClientToServerEvents {
   joinRoom: (name: string) => void;
-  createRoom: (name: string) => void;
+  createRoom: (
+    name: string,
+    callback: (response: SocketIOResponse) => void,
+  ) => void;
   leaveRoom: (name: string) => void;
 }
 
@@ -51,20 +58,21 @@ const rooms = new Map<string, string>();
 io.on('connection', (socket) => {
   console.log(` a user connected ${socket.id} }`);
 
-  socket.on('createRoom', (name: string) => {
+  socket.on('createRoom', (name: string, callback) => {
     rooms.set(name, name);
     console.log('created room');
-    console.log(rooms);
     socket.join(name);
-    console.log(socket.rooms);
-    console.log(socket.id);
+    console.log(io.sockets.adapter.rooms);
+    callback({ status: 'ok' });
     io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
   socket.on('joinRoom', (name: string) => {
-    socket.join(name);
-    // io.sockets.adapter.roo;
-    io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
+    const { rooms } = io.sockets.adapter;
+    if (rooms.get(name)) {
+      socket.join(name);
+    }
+    // io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
   socket.on('leaveRoom', (name: string) => {
