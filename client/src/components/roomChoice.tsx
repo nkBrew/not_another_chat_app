@@ -7,16 +7,19 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import CreateRoomModal from './createRoom';
+import JoinRoomModal from './joinRoomModal';
 
 const RoomChoice = () => {
-  // test();
-  // const [socket, setSocket] = useState<Socket | undefined>();
-  const [messages, setMessages] = useState(['']);
   const [rooms, setRooms] = useState<string[]>([]);
-  const [showCreateRoomModal, setCreateRoomModal] = useState(false);
+  const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
+  const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
   const [x, setX] = useState(0);
   const setSocket = useSocketStore((state) => state.setSocket);
-  const [room, setRoom] = useRoomStore((state) => [state.room, state.setRoom]);
+  const [room, setRoom, setMessages] = useRoomStore((state) => [
+    state.room,
+    state.setRoom,
+    state.setMessages,
+  ]);
 
   useEffect(() => {
     const socket = io('http://localhost:3001', {
@@ -25,7 +28,11 @@ const RoomChoice = () => {
     socket.on('rooms', (msg: CreateRoomResponse) => {
       console.log(msg);
       //First index is socketID
-      setRooms([...msg.rooms.slice(1, msg.rooms.length)]);
+      // setRooms([...msg.rooms.slice(1, msg.rooms.length)]);
+      setRooms([...msg.rooms]);
+    });
+    socket.on('message', (msg: string) => {
+      setMessages(msg);
     });
     setSocket(socket);
     return () => {
@@ -40,21 +47,27 @@ const RoomChoice = () => {
 
   console.log(room);
   return (
-    <div className="fixed left-0 h-full bg-red-500">
+    <div className="h-full bg-red-500">
       <CreateRoomModal
         show={showCreateRoomModal}
-        setShow={setCreateRoomModal}
+        setShow={setShowCreateRoomModal}
       />
+      <JoinRoomModal show={showJoinRoomModal} setShow={setShowJoinRoomModal} />
       <div className="flex flex-col">
         <button
           className="m-3 bg-blue-300 rounded-lg"
           //  onClick={emitCreateRoom}
-          onClick={() => setCreateRoomModal(true)}
+          onClick={() => setShowCreateRoomModal(true)}
         >
           Create room
         </button>
 
-        <button className="m-3 bg-blue-300 rounded-lg">Join room</button>
+        <button
+          className="m-3 bg-blue-300 rounded-lg"
+          onClick={() => setShowJoinRoomModal(true)}
+        >
+          Join room
+        </button>
         {rooms.map((r, i) => (
           // <button
           //   className="bg-white m-3 rounded-full h-28"
@@ -63,7 +76,7 @@ const RoomChoice = () => {
           // >
           //   {r}
           // </button>
-          <Link href={`/rooms/${r}`} key={i}>
+          <Link href={`/rooms/${r}`} key={i} onClick={() => setRoom(r)}>
             <div className="bg-white m-3 rounded-full h-28">{r}</div>
           </Link>
         ))}

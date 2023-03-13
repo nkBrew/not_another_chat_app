@@ -6,7 +6,9 @@ const JoinRoomModal = ({ show, setShow }: ModalProps) => {
   const socket = useSocketStore((state) => state.socket);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    socket?.emit('joinroom', roomName);
   };
+
   return (
     <>
       {show && (
@@ -15,7 +17,7 @@ const JoinRoomModal = ({ show, setShow }: ModalProps) => {
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col p-10">
                 <div className="flex justify-between">
-                  <div>Create Room</div>
+                  <div>Join Room</div>
                   <button onClick={() => setShow(false)}>X</button>
                 </div>
                 <div className="">
@@ -28,7 +30,7 @@ const JoinRoomModal = ({ show, setShow }: ModalProps) => {
                     className="bg-blue-400 py-1 px-3 rounded-md hover:bg-blue-500"
                     type="submit"
                   >
-                    Create
+                    Join
                   </button>
                 </div>
               </div>

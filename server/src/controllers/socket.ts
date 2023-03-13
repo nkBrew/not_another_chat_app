@@ -31,6 +31,7 @@ import { Server, Socket } from 'socket.io';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
+  message: (msg: string) => void;
 }
 
 interface SocketIOResponse {
@@ -44,26 +45,52 @@ interface ClientToServerEvents {
     callback: (response: SocketIOResponse) => void,
   ) => void;
   leaveRoom: (name: string) => void;
+  message: (room: string, msg: string) => void;
 }
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents>({
+interface SocketData {
+  username: string;
+}
+
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  object,
+  SocketData
+>({
   cors: {
     origin: ['http://localhost:3000'],
     credentials: true,
   },
 });
 
-const rooms = new Map<string, string>();
+// const rooms = new Map<string, string>();
+
+interface SocketUser {
+  name: string;
+  id: string;
+  rooms: Set<string>;
+}
+
+const socketUsers = new Map<string, SocketUser>();
 
 io.on('connection', (socket) => {
   console.log(` a user connected ${socket.id} }`);
+  const rooms = io.sockets.adapter.rooms;
+  const socketUser = {
+    name: '',
+    id: socket.id,
+    rooms: new Set<string>(),
+  };
+
+  socketUsers.set(socket.id, socketUser);
 
   socket.on('createRoom', (name: string, callback) => {
-    rooms.set(name, name);
-    console.log('created room');
+    console.log('created room: ', name);
     socket.join(name);
-    console.log(io.sockets.adapter.rooms);
     callback({ status: 'ok' });
+
+    console.log(socket.rooms);
     io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
@@ -72,7 +99,6 @@ io.on('connection', (socket) => {
     if (rooms.get(name)) {
       socket.join(name);
     }
-    // io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
   socket.on('leaveRoom', (name: string) => {
@@ -80,8 +106,16 @@ io.on('connection', (socket) => {
     io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
+  socket.on('message', (room, msg) => {
+    console.log(`msg ${msg} in room ${room}`);
+    if (rooms.get(room)) {
+      io.to(room).emit('message', msg);
+    }
+  });
+
   socket.join('testroom');
-  // io.to('testroom').emit('connectToRoom', 'You are in room');
+  console.log(rooms);
+  // socket.emit('rooms', { rooms: Array.from(rooms.keys()) });
 });
 
 export default io;

@@ -14,6 +14,7 @@ const CreateRoomModal = ({ show, setShow }: ModalProps) => {
   const socket = useSocketStore((state) => state.socket);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('here');
     e.preventDefault();
     socket?.emit('createRoom', roomName, (response) => {
       const { status } = response;
