@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { check } from 'express-validator';
 import passport from 'passport';
 import { IVerifyOptions } from 'passport-local';
-import { User } from '../users';
+import { User } from '../models/usersModel';
 
 export const postLogin = async (
   req: Request,

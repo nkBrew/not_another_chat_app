@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { ID } from './utilities/id';
+import { ID } from '../utilities/id';
 
 export interface User {
   id: string;
@@ -28,3 +28,5 @@ export const comparePassword = (
     cb(err, isMatch),
   );
 };
+
+export default { findUser, findUserById, comparePassword };

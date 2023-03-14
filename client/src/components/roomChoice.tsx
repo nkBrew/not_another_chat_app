@@ -1,8 +1,10 @@
 'use client';
 import { test } from '@/apis/backend';
 import useRoomStore from '@/store/roomStore';
+import useSocketUsersStore from '@/store/socketUsersStore';
 import useSocketStore from '@/store/store';
-import { CreateRoomResponse } from '@not-another-chat-app/common';
+import useUserStore from '@/store/userStore';
+import { CreateRoomResponse, SocketUser } from '@not-another-chat-app/common';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -20,17 +22,32 @@ const RoomChoice = () => {
     state.setRoom,
     state.setMessages,
   ]);
+  const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
+    console.log('eeeee: ', user?.accessToken);
     const socket = io('http://localhost:3001', {
-      withCredentials: true,
+      // withCredentials: true,
+      // query: { token: 'feafe' },
+      query: { token: user?.accessToken },
     });
+    socket.on('connect_error', (err) => {
+      console.log(err);
+    });
+
     socket.on('rooms', (msg: CreateRoomResponse) => {
       console.log(msg);
       //First index is socketID
       // setRooms([...msg.rooms.slice(1, msg.rooms.length)]);
       setRooms([...msg.rooms]);
     });
+
+    socket.on('users', (socketUsers: SocketUser[]) => {
+      console.log(socketUsers);
+      setSocketUsers(socketUsers);
+    });
+
     socket.on('message', (msg: string) => {
       setMessages(msg);
     });
@@ -68,6 +85,15 @@ const RoomChoice = () => {
         >
           Join room
         </button>
+        {socketUsers.map((su, i) => (
+          <div key={`su-${i}`}>
+            <Link href={`/userschat/${su.socketId}`}>
+              <div className="bg-purple-500 m-3 rounded-full h-28">
+                {su.socketId}
+              </div>
+            </Link>
+          </div>
+        ))}
         {rooms.map((r, i) => (
           // <button
           //   className="bg-white m-3 rounded-full h-28"

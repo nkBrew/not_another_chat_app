@@ -9,7 +9,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3001/test
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.ZWx4bg.HH08Mx-1nAF3ujgjlve-ykPdm3XhK0PhHYUKY2Otywc
 
 ###
 GET http://localhost:3001/logout

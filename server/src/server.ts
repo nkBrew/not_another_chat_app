@@ -1,14 +1,16 @@
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import http from 'http';
 import passport from 'passport';
 import io from './controllers/socket';
-import * as usersController from './controllers/users';
+// import * as usersController from './controllers/usersPassport';
+import * as usersController from './controllers/usersController';
 import * as passportConfig from './passport-config';
 import { TypedRequest } from './types';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const server = http.createServer(app);
@@ -29,10 +31,25 @@ app.use(
     credentials: true,
   }),
 );
-
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(express.json());
+
+const authenticateJWt = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    return res.sendStatus(401);
+  }
+  //userid
+  jwt.verify(token, process.env.SESSION_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+    console.log('jwt user: ', user);
+    //Maybe change
+    req.user = { id: user as string };
+    next();
+  });
+};
 
 io.attach(server);
 
@@ -41,20 +58,11 @@ app.get('/', (req, res) => {
   res.status(500).send('Hi');
 });
 
-const users: string[] = [];
-
-app.get('/test', (req, res) => {
-  // console.log('yep');
-  console.log(req.isAuthenticated());
+app.get('/test', authenticateJWt, (req, res) => {
   res.send();
 });
 
-app.post(
-  '/login',
-  (req: TypedRequest<{ email: string; password: string }>, res, next) => {
-    usersController.postLogin(req, res, next);
-  },
-);
+app.post('/login', usersController.login);
 
 app.get('/logout', (req, res, next) => {
   req.logout((err) => {

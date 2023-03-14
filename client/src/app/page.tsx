@@ -9,11 +9,12 @@ interface User {
 }
 
 export default function Home() {
-  const [user, setUser] = useState<User | undefined>(undefined);
+  // const [user, setUser] = useState<User | undefined>(undefined);
   return (
     <main className="flex justify-center items-center h-full">
       {/* <div className="bg-red-500">Hello</div> */}
-      {user ? <RoomChoice /> : <Login setUser={setUser} />}
+      {/* {user ? <RoomChoice /> : <Login setUser={setUser} />} */}
+      <Login />
     </main>
   );
 }

@@ -3,3 +3,12 @@ declare namespace Express {
     id: string;
   }
 }
+
+// declare namespace SocketIO {
+//   // interface User {
+//   //   id: string;
+//   // }
+//   interface Socket {
+//     userId: string;
+//   }
+// }

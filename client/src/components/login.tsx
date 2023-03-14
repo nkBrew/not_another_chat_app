@@ -1,22 +1,24 @@
 'use client';
-import { login } from '@/apis/backend';
+import { login, test } from '@/apis/backend';
+import useUserStore, { User } from '@/store/userStore';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface LoginProps {
-  setUser: (user: { userId: string; email: string }) => void;
+  // setUser: (user: { userId: string; email: string }) => void;
 }
 
-const Login = ({ setUser }: LoginProps) => {
+const Login = ({}: LoginProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(email);
     console.log(password);
     login(email, password)
-      .then((data) => {
+      .then((data: User) => {
         console.log(data);
         setUser(data);
         router.push('/rooms');

@@ -1,37 +1,15 @@
-import { CreateRoomResponse } from '@not-another-chat-app/common';
+import {
+  CreateRoomResponse,
+  Message,
+  SocketUser,
+} from '@not-another-chat-app/common';
 import { Server, Socket } from 'socket.io';
-
-// const multiplyN = (n: number) => (n: number, m: string) => n * m;
-// const triple = multiplyN(3);
-// const answer = triple('x');
-
-// const m = (fun: () => void) => (x: number) => fun(x);
-
-//No official type docs for how to do this but it works
-
-//TODO  AUTH
-// const wrap =
-//   (middleware: any) =>
-//   (socket: Socket, next: (err?: ExtendedError | undefined) => void) =>
-//     middleware(socket.request, {}, next);
-
-// io.use(wrap(sessionMiddleware));
-// io.use(wrap(passport.initialize()));
-// io.use(wrap(passport.session()));
-
-// io.use((socket, next) => {
-//   console.log(socket.request);
-//   next();
-//   if (socket.request.user) {
-//     next();
-//   } else {
-//     next(new Error('unauthorized'));
-//   }
-// });
+import jwt from 'jsonwebtoken';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
-  message: (msg: string) => void;
+  message: (msg: Message) => void;
+  users: (socketUsers: SocketUser[]) => void;
 }
 
 interface SocketIOResponse {
@@ -45,11 +23,11 @@ interface ClientToServerEvents {
     callback: (response: SocketIOResponse) => void,
   ) => void;
   leaveRoom: (name: string) => void;
-  message: (room: string, msg: string) => void;
+  message: (msg: Message) => void;
 }
 
 interface SocketData {
-  username: string;
+  userId: string;
 }
 
 const io = new Server<
@@ -64,23 +42,29 @@ const io = new Server<
   },
 });
 
-// const rooms = new Map<string, string>();
-
-interface SocketUser {
-  name: string;
-  id: string;
-  rooms: Set<string>;
-}
-
 const socketUsers = new Map<string, SocketUser>();
+
+io.use((socket, next) => {
+  const token = socket.handshake.query.token as string;
+  jwt.verify(token, process.env.SESSION_SECRET, (err, userId) => {
+    if (err) {
+      console.log(err);
+      return next(new Error('Authentication error in Socket'));
+    }
+    socket.data.userId = userId as string;
+    next();
+  });
+});
 
 io.on('connection', (socket) => {
   console.log(` a user connected ${socket.id} }`);
   const rooms = io.sockets.adapter.rooms;
+  const userId = socket.data.userId as string;
   const socketUser = {
     name: '',
-    id: socket.id,
+    socketId: socket.id,
     rooms: new Set<string>(),
+    userId: userId,
   };
 
   socketUsers.set(socket.id, socketUser);
@@ -106,16 +90,25 @@ io.on('connection', (socket) => {
     io.to(name).emit('rooms', { rooms: Array.from(socket.rooms) });
   });
 
-  socket.on('message', (room, msg) => {
-    console.log(`msg ${msg} in room ${room}`);
-    if (rooms.get(room)) {
-      io.to(room).emit('message', msg);
+  socket.on('message', (msg) => {
+    console.log(
+      `message from: ${msg.from} to: ${msg.to} content: ${msg.content}`,
+    );
+    if (rooms.get(msg.to)) {
+      io.to(msg.to).emit('message', msg);
+    } else if (socketUsers.get(msg.to)) {
+      socket.to(msg.to).to(socket.id).emit('message', msg);
     }
   });
 
-  socket.join('testroom');
+  socket.on('disconnect', (reason, description) => {
+    console.log(`Socket: ${socket.id} disconnected`);
+    socketUsers.delete(socket.id);
+  });
+
+  socket.emit('users', Array.from(socketUsers.values()));
+  // socket.join('testroom');
   console.log(rooms);
-  // socket.emit('rooms', { rooms: Array.from(rooms.keys()) });
 });
 
 export default io;
