@@ -29,7 +29,7 @@ export const postLogin = async (
         if (err) {
           return next(err);
         }
-        return res.send({ userId: user.id, email: user.email });
+        return res.send({ userId: user.id, email: user.username });
       });
     },
   )(req, res, next);

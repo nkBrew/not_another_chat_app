@@ -9,7 +9,7 @@ export interface Message {
 }
 
 export interface SocketUser {
-  name: string;
+  username: string;
   userId: string;
   socketId: string;
   rooms: Set<string>;

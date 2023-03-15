@@ -1,22 +1,14 @@
-import bcrypt from 'bcrypt';
 import cors from 'cors';
 import 'dotenv/config';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import http from 'http';
-import passport from 'passport';
-import io from './controllers/socket';
-// import * as usersController from './controllers/usersPassport';
-import * as usersController from './controllers/usersController';
-import * as passportConfig from './passport-config';
-import { TypedRequest } from './types';
 import jwt from 'jsonwebtoken';
+import * as usersController from './controllers/usersController';
+import io from './socket/socket';
 
 const app = express();
 const server = http.createServer(app);
-
-//Use this until I actually use it
-passportConfig;
 
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,

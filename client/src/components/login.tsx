@@ -15,8 +15,6 @@ const Login = ({}: LoginProps) => {
   const router = useRouter();
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email);
-    console.log(password);
     login(email, password)
       .then((data: User) => {
         console.log(data);

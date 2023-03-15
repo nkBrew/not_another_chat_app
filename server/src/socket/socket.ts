@@ -5,6 +5,7 @@ import {
 } from '@not-another-chat-app/common';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import { findUserById } from '../controllers/usersController';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
@@ -60,8 +61,14 @@ io.on('connection', (socket) => {
   console.log(` a user connected ${socket.id} }`);
   const rooms = io.sockets.adapter.rooms;
   const userId = socket.data.userId as string;
+  const user = findUserById(userId);
+  if (!user) {
+    console.log('user not found but socket was made. Closing socket');
+    socket.disconnect();
+    return;
+  }
   const socketUser = {
-    name: '',
+    username: user.username,
     socketId: socket.id,
     rooms: new Set<string>(),
     userId: userId,

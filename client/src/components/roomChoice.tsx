@@ -62,10 +62,6 @@ const RoomChoice = () => {
     };
   }, []);
 
-  const emitCreateRoom = () => {
-    // socket?.emit('createRoom', 'created-test-room');
-  };
-
   console.log(room);
   return (
     <div className="h-full bg-red-500">
@@ -89,14 +85,14 @@ const RoomChoice = () => {
         >
           Join room
         </button>
-        {socketUsers.map((su, i) => (
+        {Array.from(socketUsers.values()).map((su, i) => (
           <div key={`su-${i}`}>
             <Link
               href={`/rooms/pm/${su.socketId}`}
               onClick={() => setRoom(su.socketId)}
             >
               <div className="bg-purple-500 m-3 rounded-full h-28">
-                {su.socketId}
+                {su.username}
               </div>
             </Link>
           </div>

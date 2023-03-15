@@ -3,16 +3,16 @@ import { ID } from '../utilities/id';
 
 export interface User {
   id: string;
-  email: string;
+  username: string;
   password: string;
 }
 // bcrypt.has
 const users: User[] = [
-  { id: ID(), email: 'test', password: bcrypt.hashSync('nuts', 10) },
+  { id: ID(), username: 'test', password: bcrypt.hashSync('nuts', 10) },
 ];
 
 export const findUser = (username: string) => {
-  return users.find((u) => u.email === username);
+  return users.find((u) => u.username === username);
 };
 
 export const findUserById = (id: string) => {

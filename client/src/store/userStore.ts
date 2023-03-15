@@ -2,13 +2,13 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 export interface User {
   userId: string;
-  email: string;
+  username: string;
   accessToken: string;
 }
 
 interface UserState {
   user?: User;
-  setUser: ({ userId, email, accessToken }: User) => void;
+  setUser: ({ userId, username, accessToken }: User) => void;
 }
 
 const useUserStore = create<UserState>()(

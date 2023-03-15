@@ -1,7 +1,7 @@
+import { NextFunction, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import users from '../models/usersModel';
 import { TypedRequest } from '../types';
-import { Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 
 export const login = (
   req: TypedRequest<{ email: string; password: string }>,
@@ -24,6 +24,18 @@ export const login = (
     }
 
     const token = jwt.sign(user.id, process.env.SESSION_SECRET);
-    return res.json({ userId: user.id, email: user.email, accessToken: token });
+    return res.json({
+      userId: user.id,
+      username: user.username,
+      accessToken: token,
+    });
   });
+};
+
+export const findUser = (username: string) => {
+  return users.findUser(username);
+};
+
+export const findUserById = (id: string) => {
+  return users.findUserById(id);
 };
