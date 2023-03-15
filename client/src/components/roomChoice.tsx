@@ -4,7 +4,11 @@ import useRoomStore from '@/store/roomStore';
 import useSocketUsersStore from '@/store/socketUsersStore';
 import useSocketStore from '@/store/store';
 import useUserStore from '@/store/userStore';
-import { CreateRoomResponse, SocketUser } from '@not-another-chat-app/common';
+import {
+  CreateRoomResponse,
+  Message,
+  SocketUser,
+} from '@not-another-chat-app/common';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -48,8 +52,8 @@ const RoomChoice = () => {
       setSocketUsers(socketUsers);
     });
 
-    socket.on('message', (msg: string) => {
-      setMessages(msg);
+    socket.on('message', (msg: Message) => {
+      setMessages([msg]);
     });
     setSocket(socket);
     return () => {
@@ -87,7 +91,10 @@ const RoomChoice = () => {
         </button>
         {socketUsers.map((su, i) => (
           <div key={`su-${i}`}>
-            <Link href={`/userschat/${su.socketId}`}>
+            <Link
+              href={`/rooms/pm/${su.socketId}`}
+              onClick={() => setRoom(su.socketId)}
+            >
               <div className="bg-purple-500 m-3 rounded-full h-28">
                 {su.socketId}
               </div>

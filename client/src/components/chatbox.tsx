@@ -10,10 +10,11 @@ const Chatbox = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(`room: ${room} msg: ${value}`);
     if (value.length === 0) {
       return;
     }
-    socket?.emit('message', room, value);
+    socket?.emit('message', { from: socket.id, to: room, content: value });
     setValue('');
   };
 
