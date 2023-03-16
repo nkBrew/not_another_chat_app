@@ -3,9 +3,11 @@ import {
   Message,
   SocketUser,
 } from '@not-another-chat-app/common';
-import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import { Server, Socket } from 'socket.io';
 import { findUserById } from '../controllers/usersController';
+import messageController from '../controllers/messageController';
+import userSessionController from '../controllers/userSessionController';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
@@ -25,10 +27,16 @@ interface ClientToServerEvents {
   ) => void;
   leaveRoom: (name: string) => void;
   message: (msg: Message) => void;
+  get_messages: (userId: string) => void;
 }
 
 interface SocketData {
   userId: string;
+}
+
+interface GetMessagesReq {
+  to: string;
+  from: string;
 }
 
 const io = new Server<
@@ -76,6 +84,8 @@ io.on('connection', (socket) => {
 
   socketUsers.set(socket.id, socketUser);
 
+  userSessionController.saveUserSession(userId, socket.id);
+
   socket.on('createRoom', (name: string, callback) => {
     console.log('created room: ', name);
     socket.join(name);
@@ -105,12 +115,19 @@ io.on('connection', (socket) => {
       io.to(msg.to).emit('message', msg);
     } else if (socketUsers.get(msg.to)) {
       socket.to(msg.to).to(socket.id).emit('message', msg);
+      messageController.saveMessage(msg);
     }
+  });
+
+  socket.on('get_messages', (id) => {
+    const messages = messageController.getMessages(id);
+    // socket.to();
   });
 
   socket.on('disconnect', (reason, description) => {
     console.log(`Socket: ${socket.id} disconnected`);
     socketUsers.delete(socket.id);
+    userSessionController.deleteUserSession(socket.id);
   });
 
   socket.emit('users', Array.from(socketUsers.values()));

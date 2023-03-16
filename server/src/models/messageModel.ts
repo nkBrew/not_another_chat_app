@@ -1,17 +1,26 @@
+import { ID } from '../utilities/id';
+
 interface MessageModel {
   from: string;
-  msg: string;
-  room: string;
+  content: string;
+  to: string;
+  timestamp: number;
 }
 
 const db: Map<string, MessageModel> = new Map();
 
 const saveMessage = (message: MessageModel) => {
-  db.set(message.room, message);
+  db.set(ID(), message);
 };
 
-const getMessages = (id: string) => {
+const getMessagesbyId = (id: string) => {
   return db.get(id);
 };
 
-export default { saveMessage, getMessages };
+const getMessagesByUserId = (userId: string) => {
+  return Array.from(db.values()).filter(
+    (msg) => msg.from === userId || msg.to === userId,
+  );
+};
+
+export default { saveMessage, getMessages: getMessagesbyId };

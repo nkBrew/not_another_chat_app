@@ -10,6 +10,7 @@ import {
   SocketUser,
 } from '@not-another-chat-app/common';
 import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import CreateRoomModal from './createRoom';
@@ -28,6 +29,7 @@ const RoomChoice = () => {
   ]);
   const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
   const user = useUserStore((state) => state.user);
+  const router = useRouter();
 
   useEffect(() => {
     console.log('eeeee: ', user?.accessToken);
@@ -38,6 +40,7 @@ const RoomChoice = () => {
     });
     socket.on('connect_error', (err) => {
       console.log(err);
+      router.push('/');
     });
 
     socket.on('rooms', (msg: CreateRoomResponse) => {

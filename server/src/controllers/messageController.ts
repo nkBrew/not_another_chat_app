@@ -1,13 +1,21 @@
+import { Message } from '@not-another-chat-app/common';
 import messages from '../models/messageModel';
-
-interface Message {
-  from: string;
-  msg: string;
-  room: string;
-}
+import chatGroupsStore from '../models/chatGroupModel';
+import { ID } from '../utilities/id';
 
 const saveMessage = (message: Message) => {
-  messages.saveMessage(message);
+  const chatGroup = chatGroupsStore.findChatGroupByUserIds([
+    message.from,
+    message.to,
+  ]) || {
+    chatGroupId: ID(),
+    userIds: [message.from, message.to],
+  };
+  if (!chatGroup) {
+    chatGroupsStore.saveChatGroup(chatGroup);
+  }
+
+  messages.saveMessage({ ...message, timestamp: Date.now() });
 };
 
 const getMessages = (id: string) => {
