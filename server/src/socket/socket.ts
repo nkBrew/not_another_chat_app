@@ -27,7 +27,7 @@ interface ClientToServerEvents {
   ) => void;
   leaveRoom: (name: string) => void;
   message: (msg: Message) => void;
-  get_messages: (userId: string) => void;
+  get_messages: (req: GetMessagesReq) => void;
 }
 
 interface SocketData {
@@ -35,8 +35,10 @@ interface SocketData {
 }
 
 interface GetMessagesReq {
-  to: string;
-  from: string;
+  conversationId?: string;
+  users?: string[];
+  // userId1: string;
+  // userId2: string;
 }
 
 const io = new Server<
@@ -119,9 +121,19 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('get_messages', (id) => {
-    const messages = messageController.getMessages(id);
-    // socket.to();
+  socket.on('get_messages', (req) => {
+    // const messages = messageController.getMessages(id);
+    if (req.conversationId) {
+      //TODO get by conversation id
+    } else if (req.users) {
+      //TODO get by userIds
+    }
+
+    const socketIds = userSessionController
+      .findUserSessionsByUserIds([])
+      .map((session) => session.socketId);
+    //TODO
+    // socket.to(socketIds).messages;
   });
 
   socket.on('disconnect', (reason, description) => {

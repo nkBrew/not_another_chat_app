@@ -6,6 +6,8 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import * as usersController from './controllers/usersController';
 import io from './socket/socket';
+import mongoose from 'mongoose';
+import messageModel from './models/messageModel';
 
 const app = express();
 const server = http.createServer(app);
@@ -15,7 +17,6 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
 });
-console.log(process.env.SESSION_SECRET);
 app.use(
   sessionMiddleware,
   cors({
@@ -24,6 +25,14 @@ app.use(
   }),
 );
 app.use(express.json());
+
+mongoose.connect('mongodb://localhost:27017/test');
+const db = mongoose.connection;
+db.on('error', (error) => {
+  console.log(error);
+});
+
+db.once('connected', () => console.log('Connected to database'));
 
 const authenticateJWt = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -50,9 +59,18 @@ app.get('/', (req, res) => {
   res.status(500).send('Hi');
 });
 
-app.get('/test', authenticateJWt, (req, res) => {
+app.get('/register', (req, res) => {
+  console.log('Registering');
+});
+
+app.get('/test', (req, res) => {
+  messageModel.testSave();
   res.send();
 });
+
+// app.get('/test', authenticateJWt, (req, res) => {
+//   res.send();
+// });
 
 app.post('/login', usersController.login);
 
@@ -65,4 +83,5 @@ app.get('/logout', (req, res, next) => {
   });
 });
 
+console.log('Server Started');
 server.listen(3001);

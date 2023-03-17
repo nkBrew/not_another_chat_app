@@ -9,8 +9,17 @@ const findUserSessionByUserId = (userId: string) => {
   userSessionStore.findUserSessionByUserId(userId);
 };
 
+const findUserSessionsByUserIds = (userIds: string[]) => {
+  return userSessionStore.findUserSessionsByUserIds(userIds);
+};
+
 const deleteUserSession = (userId: string) => {
   userSessionStore.deleteUserSession(userId);
 };
 
-export default { saveUserSession, findUserSessionByUserId, deleteUserSession };
+export default {
+  saveUserSession,
+  findUserSessionByUserId,
+  findUserSessionsByUserIds,
+  deleteUserSession,
+};
