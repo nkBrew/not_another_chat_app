@@ -28,10 +28,16 @@ const conversationSchema = new mongoose.Schema({
   members: { type: [String] },
 });
 
-const ConversationModel = mongoose.model('Conversations', conversationSchema);
+export const ConversationModel = mongoose.model(
+  'Conversations',
+  conversationSchema,
+);
 
 const saveConversation = (name: string, members: string[]) => {
   const data = new ConversationModel({ name, members: [...members.sort()] });
+  data.save();
+  const conversation: Conversation = { id: data.id, name, members };
+  return conversation;
 };
 
 const findById = async (id: string) => {

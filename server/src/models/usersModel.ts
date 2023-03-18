@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 import { ID } from '../utilities/id';
 
 export interface User {
@@ -6,17 +7,60 @@ export interface User {
   username: string;
   password: string;
 }
-// bcrypt.has
+
 const users: User[] = [
   { id: ID(), username: 'test', password: bcrypt.hashSync('nuts', 10) },
 ];
 
-export const findUser = (username: string) => {
-  return users.find((u) => u.username === username);
+const userSchema = new mongoose.Schema<User>({
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+});
+
+export const UsersModel = mongoose.model('Users', userSchema);
+
+const saveUser = ({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}) => {
+  console.log(bcrypt.hashSync(password, 10));
+  const data = new UsersModel({
+    username: username,
+    password: bcrypt.hashSync(password, 10),
+  });
+  data.save();
 };
 
-export const findUserById = (id: string) => {
-  return users.find((u) => u.id === id);
+export const findUser = async (username: string) => {
+  const document = await UsersModel.findOne({ username });
+  return document;
+};
+
+export const findUserAsync = async (username: string) => {
+  const document = await UsersModel.findOne({ username });
+  if (!document) {
+    return undefined;
+  }
+  return {
+    id: document.id,
+    username: document.username,
+    password: document.password,
+  };
+};
+
+// export const findUserById = (id: string) => {
+//   return users.find((u) => u.id === id);
+// };
+
+export const findUserById = async (id: string) => {
+  const document = await UsersModel.findById(id);
+  if (!document) {
+    return undefined;
+  }
+  return { id: document.id, username: document.username };
 };
 
 export const comparePassword = (
@@ -29,4 +73,11 @@ export const comparePassword = (
   );
 };
 
-export default { findUser, findUserById, comparePassword };
+export default {
+  findUser,
+  findUserById,
+  comparePassword,
+  findUserAsync,
+  saveUser,
+  UsersModel,
+};

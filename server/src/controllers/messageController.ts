@@ -1,6 +1,6 @@
 import { Message } from '@not-another-chat-app/common';
 import messages, { NewMessage } from '../models/messageModel';
-import conversationStore from '../models/chatGroupModel';
+import conversationStore, { ConversationModel } from '../models/chatGroupModel';
 import { ID } from '../utilities/id';
 
 const saveMessage = (message: Message) => {
@@ -20,7 +20,10 @@ const saveMessage = (message: Message) => {
     .findByMembers(members)
     .then((conversation) => {
       if (!conversation) {
-        conversationStore.saveConversation('Private', members);
+        const conversation = conversationStore.saveConversation(
+          'Private',
+          members,
+        );
       }
       messages.saveMessage({ ...message, timestamp: Date.now() });
     })
@@ -33,7 +36,7 @@ const getMessages = (id: string) => {
   messages.getMessages(id);
 };
 
-const getMessagesByConversation = (id: string) => {
+const getMessagesByConversationId = (id: string) => {
   return messages.findMessagesByConversationId(id).then((data) => {
     if (!data) {
       return [];
@@ -49,4 +52,19 @@ const getMessagesByConversation = (id: string) => {
   });
 };
 
-export default { saveMessage, getMessages };
+const getUserConversations = async (userId: string) => {
+  const documents = await ConversationModel.find({ members: userId });
+  const conversations = documents.map((doc) => ({
+    conversationId: doc.id,
+    name: doc.name,
+    members: doc.members,
+  }));
+  return conversations;
+};
+
+export default {
+  saveMessage,
+  getMessages,
+  getMessagesByConversationId,
+  getUserConversations,
+};

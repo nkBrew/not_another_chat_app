@@ -5,14 +5,21 @@ import {
 } from '@not-another-chat-app/common';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
-import { findUserById } from '../controllers/usersController';
+import {
+  findUserById,
+  getUsersAndConversations,
+  UserDto,
+} from '../controllers/usersController';
 import messageController from '../controllers/messageController';
 import userSessionController from '../controllers/userSessionController';
+import { NewMessage } from '../models/messageModel';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
   message: (msg: Message) => void;
   users: (socketUsers: SocketUser[]) => void;
+  get_messages: ({ messages }: { messages: NewMessage[] }) => void;
+  users_testnew: (users: UserDto[]) => void;
 }
 
 interface SocketIOResponse {
@@ -67,11 +74,11 @@ io.use((socket, next) => {
   });
 });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log(` a user connected ${socket.id} }`);
   const rooms = io.sockets.adapter.rooms;
   const userId = socket.data.userId as string;
-  const user = findUserById(userId);
+  const user = await findUserById(userId);
   if (!user) {
     console.log('user not found but socket was made. Closing socket');
     socket.disconnect();
@@ -123,17 +130,16 @@ io.on('connection', (socket) => {
 
   socket.on('get_messages', (req) => {
     // const messages = messageController.getMessages(id);
-    if (req.conversationId) {
-      //TODO get by conversation id
-    } else if (req.users) {
-      //TODO get by userIds
-    }
 
-    const socketIds = userSessionController
-      .findUserSessionsByUserIds([])
-      .map((session) => session.socketId);
-    //TODO
-    // socket.to(socketIds).messages;
+    if (req.conversationId) {
+      messageController
+        .getMessagesByConversationId(req.conversationId)
+        .then((foundMessages) => {
+          socket
+            .to(socket.id)
+            .emit('get_messages', { messages: foundMessages });
+        });
+    }
   });
 
   socket.on('disconnect', (reason, description) => {
@@ -142,7 +148,12 @@ io.on('connection', (socket) => {
     userSessionController.deleteUserSession(socket.id);
   });
 
+  //Get users
   socket.emit('users', Array.from(socketUsers.values()));
+  getUsersAndConversations().then((users) => {
+    console.log(`testing ${users}`);
+    socket.emit('users_testnew', users);
+  });
   // socket.join('testroom');
   console.log(rooms);
 });

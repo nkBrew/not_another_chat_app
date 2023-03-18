@@ -6,6 +6,15 @@ Content-Type: application/json
   "password": "nuts"
 }
 
+###
+POST http://localhost:3001/register
+Content-Type: application/json
+
+{
+  "username":"test",
+  "password": "nuts"
+}
+
 
 ###
 GET http://localhost:3001/test

@@ -58,6 +58,10 @@ const RoomChoice = () => {
     socket.on('message', (msg: Message) => {
       setMessages([msg]);
     });
+
+    socket.on('users_testnew', (data) => {
+      console.log(data);
+    });
     setSocket(socket);
     return () => {
       socket.off('connect');

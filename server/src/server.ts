@@ -59,19 +59,12 @@ app.get('/', (req, res) => {
   res.status(500).send('Hi');
 });
 
-app.get('/register', (req, res) => {
-  console.log('Registering');
-});
-
 app.get('/test', (req, res) => {
   messageModel.testSave();
   res.send();
 });
 
-// app.get('/test', authenticateJWt, (req, res) => {
-//   res.send();
-// });
-
+app.post('/register', usersController.register);
 app.post('/login', usersController.login);
 
 app.get('/logout', (req, res, next) => {
