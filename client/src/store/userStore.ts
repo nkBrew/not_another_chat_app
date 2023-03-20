@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { config } from './storeConfig';
+
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 export interface User {
   userId: string;
@@ -6,7 +8,7 @@ export interface User {
   accessToken: string;
 }
 
-interface UserState {
+export interface UserState {
   user?: User;
   setUser: ({ userId, username, accessToken }: User) => void;
 }
@@ -23,6 +25,7 @@ const useUserStore = create<UserState>()(
         storage: createJSONStorage(() => sessionStorage),
       },
     ),
+    { ...config, store: 'user' },
   ),
 );
 

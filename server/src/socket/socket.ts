@@ -1,12 +1,16 @@
 import {
+  ConversationDto,
   CreateRoomResponse,
   Message,
   SocketUser,
+  UserBasic,
 } from '@not-another-chat-app/common';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import {
   findUserById,
+  getUserMatchedConversations,
+  getUsers,
   getUsersAndConversations,
   UserDto,
 } from '../controllers/usersController';
@@ -19,7 +23,8 @@ interface ServerToClientEvents {
   message: (msg: Message) => void;
   users: (socketUsers: SocketUser[]) => void;
   get_messages: ({ messages }: { messages: NewMessage[] }) => void;
-  users_testnew: (users: UserDto[]) => void;
+  users_testnew: (users: UserBasic[]) => void;
+  pm_conversations: (conversations: ConversationDto[]) => void;
 }
 
 interface SocketIOResponse {
@@ -130,7 +135,6 @@ io.on('connection', async (socket) => {
 
   socket.on('get_messages', (req) => {
     // const messages = messageController.getMessages(id);
-
     if (req.conversationId) {
       messageController
         .getMessagesByConversationId(req.conversationId)
@@ -149,11 +153,15 @@ io.on('connection', async (socket) => {
   });
 
   //Get users
-  socket.emit('users', Array.from(socketUsers.values()));
-  getUsersAndConversations().then((users) => {
-    console.log(`testing ${users}`);
+
+  getUsers().then((users) => {
     socket.emit('users_testnew', users);
   });
+
+  messageController.getUserConversations(userId).then((conversations) => {
+    socket.emit('pm_conversations', conversations);
+  });
+
   // socket.join('testroom');
   console.log(rooms);
 });

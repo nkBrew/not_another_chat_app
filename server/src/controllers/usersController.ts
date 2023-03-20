@@ -5,6 +5,7 @@ import users from '../models/usersModel';
 import { TypedRequest } from '../types';
 import bcrypt from 'bcrypt';
 import messageController from './messageController';
+import { ConversationDto, UserBasic } from '@not-another-chat-app/common';
 
 export const login = (
   req: TypedRequest<{ email: string; password: string }>,
@@ -49,12 +50,6 @@ export const findUserById = (id: string) => {
   return users.findUserById(id);
 };
 
-export interface ConversationDto {
-  conversationId: string;
-  name: string;
-  members: string[];
-}
-
 export interface UserDto {
   userId: string;
   username: string;
@@ -73,8 +68,34 @@ export const getUsersAndConversations = async () => {
     const conversations = await messageController.getUserConversations(
       user.userId,
     );
-    user.conversations = conversations;
+    // user.conversations = conversations;
   }
+  return users;
+};
+
+export const getUserMatchedConversations = async (userId: string) => {
+  const userDocs = await UsersModel.find();
+  const users: UserDto[] = userDocs.map((doc) => ({
+    userId: doc.id,
+    username: doc.username,
+    conversations: [],
+  }));
+  for (const user of users) {
+    const conversations = await messageController.getMatchingUserConversations([
+      userId,
+      user.userId,
+    ]);
+    // user.conversations = conversations;
+  }
+  return users;
+};
+
+export const getUsers = async () => {
+  const userDocs = await UsersModel.find();
+  const users: UserBasic[] = userDocs.map((doc) => ({
+    userId: doc.id,
+    username: doc.username,
+  }));
   return users;
 };
 
@@ -92,8 +113,10 @@ export const register = async (
     username,
     password: bcrypt.hashSync(password, 10),
   });
-  document.save();
+
+  await document.save();
 
   console.log(`New user created ${document.id}`);
+  messageController.createConversationsForNewUser(document.id);
   return res.sendStatus(201);
 };

@@ -1,13 +1,15 @@
 'use client';
 import { test } from '@/apis/backend';
+import usePMStore from '@/store/pmStore';
 import useRoomStore from '@/store/roomStore';
-import useSocketUsersStore from '@/store/socketUsersStore';
-import useSocketStore from '@/store/store';
+import useSocketStore from '@/store/socketStore';
 import useUserStore from '@/store/userStore';
 import {
+  ConversationDto,
   CreateRoomResponse,
   Message,
   SocketUser,
+  UserBasic,
 } from '@not-another-chat-app/common';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
@@ -15,6 +17,8 @@ import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import CreateRoomModal from './createRoom';
 import JoinRoomModal from './joinRoomModal';
+import useOthersStore from '@/store/othersStore';
+import useSocketUsersStore from '@/store/socketUsersStore';
 
 const RoomChoice = () => {
   const [rooms, setRooms] = useState<string[]>([]);
@@ -30,7 +34,8 @@ const RoomChoice = () => {
   const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-
+  const { conversations, setConversations } = usePMStore((state) => state);
+  const { others, setOthers } = useOthersStore((state) => state);
   useEffect(() => {
     console.log('eeeee: ', user?.accessToken);
     const socket = io('http://localhost:3001', {
@@ -59,8 +64,14 @@ const RoomChoice = () => {
       setMessages([msg]);
     });
 
-    socket.on('users_testnew', (data) => {
+    socket.on('users_testnew', (data: UserBasic[]) => {
       console.log(data);
+      setOthers(data);
+    });
+
+    socket.on('pm_conversations', (data: ConversationDto[]) => {
+      console.log(data);
+      setConversations(data);
     });
     setSocket(socket);
     return () => {
@@ -69,7 +80,7 @@ const RoomChoice = () => {
     };
   }, []);
 
-  console.log(room);
+  // console.log(`others: `);
   return (
     <div className="h-full bg-red-500">
       <CreateRoomModal
@@ -92,14 +103,20 @@ const RoomChoice = () => {
         >
           Join room
         </button>
-        {Array.from(socketUsers.values()).map((su, i) => (
-          <div key={`su-${i}`}>
+        {/* {Array.from(socketUsers.values()).map((su, i) => ( */}
+        {Array.from(conversations.values()).map((convo, i) => (
+          <div key={`convo-${i}`}>
             <Link
-              href={`/rooms/pm/${su.socketId}`}
-              onClick={() => setRoom(su.socketId)}
+              href={`/rooms/pm/${convo.conversationId}`}
+              onClick={() => setRoom(convo.conversationId)}
             >
               <div className="bg-purple-500 m-3 rounded-full h-28">
-                {su.username}
+                {/* {su.username} */}
+                {convo.memberIds
+                  .filter((id) => id !== user?.userId)
+                  .map((userId, j) => (
+                    <div key={j}>{others.get(userId)?.username}</div>
+                  ))}
               </div>
             </Link>
           </div>

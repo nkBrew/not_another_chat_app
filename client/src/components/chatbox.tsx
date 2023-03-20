@@ -1,6 +1,6 @@
 'use client';
 import useRoomStore from '@/store/roomStore';
-import useSocketStore from '@/store/store';
+import useSocketStore from '@/store/socketStore';
 import React, { useState } from 'react';
 
 const Chatbox = () => {

@@ -1,4 +1,4 @@
-import useSocketStore from '@/store/store';
+import useSocketStore from '@/store/socketStore';
 import React, { useState } from 'react';
 import { ModalProps } from './createRoom';
 const JoinRoomModal = ({ show, setShow }: ModalProps) => {

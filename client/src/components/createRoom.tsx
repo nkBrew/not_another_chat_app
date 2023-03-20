@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import useSocketStore from '@/store/store';
+import useSocketStore from '@/store/socketStore';
 
 export interface ModalProps {
   show: boolean;
