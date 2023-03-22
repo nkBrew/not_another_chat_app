@@ -3,8 +3,8 @@ export interface CreateRoomResponse {
 }
 
 export interface Message {
-  to: string;
-  from: string;
+  conversationId: string;
+  fromUserId: string;
   content: string;
   timestamp?: number;
 }

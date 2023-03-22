@@ -17,13 +17,13 @@ import mongoose from 'mongoose';
 //   return chatGroup[0] || undefined;
 // };
 
-interface Conversation {
+export interface Conversation {
   id: string;
   name: string;
   members: string[];
 }
 
-const conversationSchema = new mongoose.Schema({
+const conversationSchema = new mongoose.Schema<Conversation>({
   name: { type: String, required: true },
   members: { type: [String] },
 });

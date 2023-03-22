@@ -26,11 +26,9 @@ const RoomChoice = () => {
   const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
   const [x, setX] = useState(0);
   const setSocket = useSocketStore((state) => state.setSocket);
-  const [room, setRoom, setMessages] = useRoomStore((state) => [
-    state.room,
-    state.setRoom,
-    state.setMessages,
-  ]);
+  const { room, setRoom, setMessages, setConversationId } = useRoomStore(
+    (state) => state,
+  );
   const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
   const user = useUserStore((state) => state.user);
   const router = useRouter();
@@ -61,6 +59,7 @@ const RoomChoice = () => {
     });
 
     socket.on('message', (msg: Message) => {
+      console.log(`got message: ${msg}`);
       setMessages([msg]);
     });
 
@@ -113,9 +112,15 @@ const RoomChoice = () => {
               <div className="bg-purple-500 m-3 rounded-full h-28">
                 {/* {su.username} */}
                 {convo.memberIds
-                  .filter((id) => id !== user?.userId)
+                  .filter(
+                    (id) => id !== user?.userId || convo.memberIds.length === 1,
+                  )
                   .map((userId, j) => (
-                    <div key={j}>{others.get(userId)?.username}</div>
+                    <div key={j}>
+                      {`${others.get(userId)?.username}${
+                        userId === user?.userId ? ' (You)' : ''
+                      }`}
+                    </div>
                   ))}
               </div>
             </Link>

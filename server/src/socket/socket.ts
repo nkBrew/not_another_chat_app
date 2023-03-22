@@ -123,14 +123,29 @@ io.on('connection', async (socket) => {
 
   socket.on('message', (msg) => {
     console.log(
-      `message from: ${msg.from} to: ${msg.to} content: ${msg.content}`,
+      `message from: ${msg.fromUserId} to: ${msg.conversationId} content: ${msg.content}`,
     );
-    if (rooms.get(msg.to)) {
-      io.to(msg.to).emit('message', msg);
-    } else if (socketUsers.get(msg.to)) {
-      socket.to(msg.to).to(socket.id).emit('message', msg);
-      messageController.saveMessage(msg);
-    }
+    // if (rooms.get(msg.to)) {
+    //   io.to(msg.to).emit('message', msg);
+    // } else if (socketUsers.get(msg.to)) {
+    //   socket.to(msg.to).to(socket.id).emit('message', msg);
+    //   messageController.saveMessage(msg);
+    // }
+    messageController.saveMessage(msg).then(async () => {
+      const conversation = await messageController.getConversationById(
+        msg.conversationId,
+      );
+      if (!conversation) {
+        return;
+      }
+      const userSessions = userSessionController.findUserSessionsByUserIds(
+        conversation.memberIds,
+      );
+      console.log(socket.id);
+      console.log(userSessions.map((us) => us.socketId));
+      io.to(userSessions.map((us) => us.socketId)).emit('message', msg);
+      console.log('got here');
+    });
   });
 
   socket.on('get_messages', (req) => {

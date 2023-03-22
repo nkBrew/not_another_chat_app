@@ -36,7 +36,7 @@ const messageSchema = new mongoose.Schema({
   content: String,
   timestamp: { type: String, required: true, default: Date.now },
 });
-const MessageModel = mongoose.model('Messages', messageSchema);
+export const MessageModel = mongoose.model('Messages', messageSchema);
 
 const testSave = () => {
   const data = new MessageModel({

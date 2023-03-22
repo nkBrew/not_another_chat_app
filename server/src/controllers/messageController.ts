@@ -1,10 +1,13 @@
-import { Message } from '@not-another-chat-app/common';
-import messages, { NewMessage } from '../models/messageModel';
-import conversationStore, { ConversationModel } from '../models/chatGroupModel';
+import { ConversationDto, Message } from '@not-another-chat-app/common';
+import messages, { MessageModel, NewMessage } from '../models/messageModel';
+import conversationStore, {
+  Conversation,
+  ConversationModel,
+} from '../models/chatGroupModel';
 import { ID } from '../utilities/id';
 import { UsersModel } from '../models/usersModel';
 
-const saveMessage = (message: Message) => {
+const saveMessage = async (message: Message) => {
   // const chatGroup = chatGroupsStore.findChatGroupByUserIds([
   //   message.from,
   //   message.to,
@@ -16,21 +19,53 @@ const saveMessage = (message: Message) => {
   //   chatGroupsStore.saveChatGroup(chatGroup);
   // }
 
-  const members = [message.from, message.to];
-  conversationStore
-    .findByMembers(members)
-    .then((conversation) => {
-      if (!conversation) {
-        const conversation = conversationStore.saveConversation(
-          'Private',
-          members,
-        );
-      }
-      messages.saveMessage({ ...message, timestamp: Date.now() });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const convoDoc = await ConversationModel.findById(message.conversationId);
+  if (!convoDoc) {
+    return;
+  }
+
+  message.timestamp = Date.now();
+  const data = new MessageModel({ ...message });
+  data.save();
+
+  return message;
+  // const coversation: ConversationDto = {
+  //   conversationId: convoDoc.id,
+  //   memberIds: convoDoc.members,
+  //   conversationName: convoDoc.name,
+  // };
+  // .findByMembers(members)
+  // .then((conversation) => {
+  //   if (!conversation) {
+  //     const conversation = conversationStore.saveConversation(
+  //       'Private',
+  //       members,
+  //     );
+  //   }
+  //   messages.saveMessage({ ...message, timestamp: Date.now() });
+  // })
+  // .catch((err) => {
+  //   console.log(err);
+  // });
+};
+
+const getConversationById = async (id: string) => {
+  const doc = await ConversationModel.findById(id);
+  if (!doc) {
+    return;
+  }
+  // deserialize(doc);
+  // const conversation: ConversationDto = deserialize(doc);
+  return deserialize(doc);
+};
+
+const deserialize = (doc: Conversation) => {
+  const conversation: ConversationDto = {
+    conversationId: doc.id,
+    conversationName: doc.name,
+    memberIds: doc.members,
+  };
+  return conversation;
 };
 
 const getMessages = (id: string) => {
@@ -77,9 +112,10 @@ const getMatchingUserConversations = async (userIds: string[]) => {
 const createConversationsForNewUser = async (newUserId: string) => {
   const userDocs = await UsersModel.find();
   console.log(`found users ${userDocs.map((doc) => doc.username)}`);
+
   const pmConversations = userDocs.map((doc) => ({
     name: 'Private',
-    members: [newUserId, doc.id].sort(),
+    members: [...new Set([newUserId, doc.id])].sort(),
   }));
   ConversationModel.insertMany(pmConversations);
 };
@@ -91,4 +127,5 @@ export default {
   getUserConversations,
   getMatchingUserConversations,
   createConversationsForNewUser,
+  getConversationById,
 };
