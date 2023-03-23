@@ -1,7 +1,6 @@
 import { ConversationDto, Message } from '@not-another-chat-app/common';
 import { MessageModel, MessageDocument } from '../models/messageModel';
 
-import { ID } from '../utilities/id';
 import { UsersModel } from '../models/usersModel';
 import {
   ConversationDocument,

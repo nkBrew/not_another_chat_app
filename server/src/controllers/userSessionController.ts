@@ -1,6 +1,5 @@
-import userSessionStore from '../models/userSessionStore';
 import { ID } from '../utilities/id';
-import db from '../models/userSessionStore';
+import db from '../models/userSessionModel';
 
 export const saveUserSession = (userId: string, socketId: string) => {
   const session = { userId, socketId, sessionId: ID() };

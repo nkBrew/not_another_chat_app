@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UsersModel } from '../models/usersModel';
 import users from '../models/usersModel';
@@ -36,7 +36,6 @@ export const login = (
         userId: user.userId,
         username: user.username,
         accessToken: token,
-        // ...user,
       });
     });
   });

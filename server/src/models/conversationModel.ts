@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-export interface ConversationDocument {
+export interface ConversationDocument extends Document {
   id: string;
   name: string;
   members: string[];

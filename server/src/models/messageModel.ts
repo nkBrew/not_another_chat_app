@@ -1,4 +1,3 @@
-import { ID } from '../utilities/id';
 import mongoose, { Document } from 'mongoose';
 
 export interface MessageDocument extends Document {

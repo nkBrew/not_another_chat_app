@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { ID } from '../utilities/id';
 
-export interface User {
+export interface User extends Document {
   id: string;
   username: string;
   password: string;
