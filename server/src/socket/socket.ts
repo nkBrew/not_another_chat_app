@@ -2,6 +2,7 @@ import {
   ConversationDto,
   CreateRoomResponse,
   Message,
+  NewMessage,
   SocketUser,
   UserBasic,
 } from '@not-another-chat-app/common';
@@ -13,11 +14,11 @@ import * as userSessionController from '../controllers/userSessionController';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
-  message: (msg: Message) => void;
+  message: (msg: NewMessage) => void;
   users: (socketUsers: SocketUser[]) => void;
-  get_messages: ({ messages }: { messages: Message[] }) => void;
   users_testnew: (users: UserBasic[]) => void;
   pm_conversations: (conversations: ConversationDto[]) => void;
+  messages: (msgs: Message[]) => void;
 }
 
 interface SocketIOResponse {
@@ -32,7 +33,7 @@ interface ClientToServerEvents {
   ) => void;
   leaveRoom: (name: string) => void;
   message: (msg: Message) => void;
-  get_messages: (req: GetMessagesReq) => void;
+  get_messages: (conversationId: string) => void;
 }
 
 interface SocketData {
@@ -136,16 +137,15 @@ io.on('connection', async (socket) => {
     });
   });
 
-  socket.on('get_messages', (req) => {
-    if (req.conversationId) {
-      messageController
-        .getMessagesByConversationId(req.conversationId)
-        .then((foundMessages) => {
-          socket
-            .to(socket.id)
-            .emit('get_messages', { messages: foundMessages });
-        });
-    }
+  socket.on('get_messages', (conversationId) => {
+    console.log('got here');
+    messageController
+      .getMessagesByConversationId(conversationId)
+      .then((foundMessages) => {
+        // console.log('then got here', foundMessages);
+        // console.log(foundMessages);
+        io.to(socket.id).emit('messages', foundMessages);
+      });
   });
 
   socket.on('disconnect', (reason, description) => {

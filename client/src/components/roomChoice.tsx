@@ -1,7 +1,7 @@
 'use client';
 import { test } from '@/apis/backend';
 import usePMStore from '@/store/pmStore';
-import useRoomStore from '@/store/roomStore';
+import useMessageStore from '@/store/messageStore';
 import useSocketStore from '@/store/socketStore';
 import useUserStore from '@/store/userStore';
 import {
@@ -26,7 +26,7 @@ const RoomChoice = () => {
   const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
   const [x, setX] = useState(0);
   const setSocket = useSocketStore((state) => state.setSocket);
-  const { room, setRoom, setMessages, setConversationId } = useRoomStore(
+  const { conversationId, setMessages, setConversationId } = useMessageStore(
     (state) => state,
   );
   const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
@@ -60,7 +60,17 @@ const RoomChoice = () => {
 
     socket.on('message', (msg: Message) => {
       console.log(`got message: ${msg}`);
-      setMessages([msg]);
+
+      setMessages(msg.conversationId, [msg]);
+    });
+
+    socket.on('messages', (msgs: Message[]) => {
+      console.log(`got message: ${msgs}`);
+
+      if (!msgs || msgs.length < 1) {
+        return;
+      }
+      setMessages(msgs[0].conversationId, msgs);
     });
 
     socket.on('users_testnew', (data: UserBasic[]) => {
@@ -107,7 +117,7 @@ const RoomChoice = () => {
           <div key={`convo-${i}`}>
             <Link
               href={`/rooms/pm/${convo.conversationId}`}
-              onClick={() => setRoom(convo.conversationId)}
+              onClick={() => setConversationId(convo.conversationId)}
             >
               <div className="bg-purple-500 m-3 rounded-full h-28">
                 {/* {su.username} */}
@@ -126,7 +136,7 @@ const RoomChoice = () => {
             </Link>
           </div>
         ))}
-        {rooms.map((r, i) => (
+        {/* {rooms.map((r, i) => (
           // <button
           //   className="bg-white m-3 rounded-full h-28"
           //   key={i}
@@ -137,7 +147,7 @@ const RoomChoice = () => {
           <Link href={`/rooms/${r}`} key={i} onClick={() => setRoom(r)}>
             <div className="bg-white m-3 rounded-full h-28">{r}</div>
           </Link>
-        ))}
+        ))} */}
       </div>
     </div>
   );

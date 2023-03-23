@@ -6,7 +6,13 @@ export interface Message {
   conversationId: string;
   fromUserId: string;
   content: string;
-  timestamp?: number;
+  timestamp: number;
+}
+
+export interface NewMessage {
+  conversationId: string;
+  fromUserId: string;
+  content: string;
 }
 
 export interface SocketUser {

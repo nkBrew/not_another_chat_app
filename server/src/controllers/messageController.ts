@@ -1,4 +1,8 @@
-import { ConversationDto, Message } from '@not-another-chat-app/common';
+import {
+  ConversationDto,
+  Message,
+  NewMessage,
+} from '@not-another-chat-app/common';
 import { MessageModel, MessageDocument } from '../models/messageModel';
 
 import { UsersModel } from '../models/usersModel';
@@ -7,14 +11,13 @@ import {
   ConversationModel,
 } from '../models/conversationModel';
 
-export const saveMessage = async (message: Message) => {
+export const saveMessage = async (message: NewMessage) => {
   const convoDoc = await ConversationModel.findById(message.conversationId);
   if (!convoDoc) {
     return;
   }
 
-  message.timestamp = Date.now();
-  const data = new MessageModel({ ...message });
+  const data = new MessageModel({ ...message, timestamp: Date.now() });
   data.save();
 
   return message;
@@ -29,7 +32,9 @@ export const getConversationById = async (id: string) => {
 };
 
 export const getMessagesByConversationId = async (id: string) => {
-  const data = await MessageModel.find({ conversationId: id });
+  const data = await MessageModel.find({ conversationId: id }).sort({
+    timestamp: -1,
+  });
 
   if (!data) {
     return [];
@@ -49,7 +54,9 @@ export const getUserConversations = async (userId: string) => {
 };
 
 const deserializeMessage = (doc: MessageDocument) => {
-  const message: Message = { ...doc };
+  const { conversationId, content, fromUserId, timestamp, id } = doc;
+  const message: Message = { conversationId, content, fromUserId, timestamp };
+  console.log(message);
   return message;
 };
 
