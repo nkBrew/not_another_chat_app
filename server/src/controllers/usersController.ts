@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import usersModel, { UsersModel } from '../models/usersModel';
+import { UsersModel } from '../models/usersModel';
 import users from '../models/usersModel';
 import { TypedRequest } from '../types';
 import bcrypt from 'bcrypt';
-import messageController from './messageController';
+import * as messageController from './messageController';
 import { ConversationDto, UserBasic } from '@not-another-chat-app/common';
 
 export const login = (
@@ -55,40 +55,6 @@ export interface UserDto {
   username: string;
   conversations: ConversationDto[];
 }
-
-export const getUsersAndConversations = async () => {
-  console.log('here');
-  const userDocs = await UsersModel.find();
-  const users: UserDto[] = userDocs.map((doc) => ({
-    userId: doc.id,
-    username: doc.username,
-    conversations: [],
-  }));
-  for (const user of users) {
-    const conversations = await messageController.getUserConversations(
-      user.userId,
-    );
-    // user.conversations = conversations;
-  }
-  return users;
-};
-
-export const getUserMatchedConversations = async (userId: string) => {
-  const userDocs = await UsersModel.find();
-  const users: UserDto[] = userDocs.map((doc) => ({
-    userId: doc.id,
-    username: doc.username,
-    conversations: [],
-  }));
-  for (const user of users) {
-    const conversations = await messageController.getMatchingUserConversations([
-      userId,
-      user.userId,
-    ]);
-    // user.conversations = conversations;
-  }
-  return users;
-};
 
 export const getUsers = async () => {
   const userDocs = await UsersModel.find();

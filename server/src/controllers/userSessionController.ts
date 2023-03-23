@@ -1,25 +1,23 @@
 import userSessionStore from '../models/userSessionStore';
 import { ID } from '../utilities/id';
+import db from '../models/userSessionStore';
 
-const saveUserSession = (userId: string, socketId: string) => {
-  userSessionStore.saveUserSession({ userId, socketId, sessionId: ID() });
+export const saveUserSession = (userId: string, socketId: string) => {
+  const session = { userId, socketId, sessionId: ID() };
+  db.set(userId, session);
 };
 
-const findUserSessionByUserId = (userId: string) => {
-  userSessionStore.findUserSessionByUserId(userId);
+export const findUserSessionByUserId = (userId: string) => {
+  return db.get(userId);
 };
 
-const findUserSessionsByUserIds = (userIds: string[]) => {
-  return userSessionStore.findUserSessionsByUserIds(userIds);
+export const findUserSessionsByUserIds = (userIds: string[]) => {
+  const found = Array.from(db.values()).filter((val) =>
+    userIds.includes(val.userId),
+  );
+  return found;
 };
 
-const deleteUserSession = (userId: string) => {
-  userSessionStore.deleteUserSession(userId);
-};
-
-export default {
-  saveUserSession,
-  findUserSessionByUserId,
-  findUserSessionsByUserIds,
-  deleteUserSession,
+export const deleteUserSession = (userId: string) => {
+  db.delete(userId);
 };

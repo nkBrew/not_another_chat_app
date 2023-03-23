@@ -6,23 +6,16 @@ import {
   UserBasic,
 } from '@not-another-chat-app/common';
 import jwt from 'jsonwebtoken';
-import { Server, Socket } from 'socket.io';
-import {
-  findUserById,
-  getUserMatchedConversations,
-  getUsers,
-  getUsersAndConversations,
-  UserDto,
-} from '../controllers/usersController';
-import messageController from '../controllers/messageController';
-import userSessionController from '../controllers/userSessionController';
-import { NewMessage } from '../models/messageModel';
+import { Server } from 'socket.io';
+import { findUserById, getUsers } from '../controllers/usersController';
+import * as messageController from '../controllers/messageController';
+import * as userSessionController from '../controllers/userSessionController';
 
 interface ServerToClientEvents {
   rooms: (msg: CreateRoomResponse) => void;
   message: (msg: Message) => void;
   users: (socketUsers: SocketUser[]) => void;
-  get_messages: ({ messages }: { messages: NewMessage[] }) => void;
+  get_messages: ({ messages }: { messages: Message[] }) => void;
   users_testnew: (users: UserBasic[]) => void;
   pm_conversations: (conversations: ConversationDto[]) => void;
 }
@@ -125,12 +118,7 @@ io.on('connection', async (socket) => {
     console.log(
       `message from: ${msg.fromUserId} to: ${msg.conversationId} content: ${msg.content}`,
     );
-    // if (rooms.get(msg.to)) {
-    //   io.to(msg.to).emit('message', msg);
-    // } else if (socketUsers.get(msg.to)) {
-    //   socket.to(msg.to).to(socket.id).emit('message', msg);
-    //   messageController.saveMessage(msg);
-    // }
+
     messageController.saveMessage(msg).then(async () => {
       const conversation = await messageController.getConversationById(
         msg.conversationId,
@@ -149,7 +137,6 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('get_messages', (req) => {
-    // const messages = messageController.getMessages(id);
     if (req.conversationId) {
       messageController
         .getMessagesByConversationId(req.conversationId)

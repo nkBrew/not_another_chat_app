@@ -8,10 +8,6 @@ export interface User {
   password: string;
 }
 
-const users: User[] = [
-  { id: ID(), username: 'test', password: bcrypt.hashSync('nuts', 10) },
-];
-
 const userSchema = new mongoose.Schema<User>({
   username: { type: String, required: true },
   password: { type: String, required: true },

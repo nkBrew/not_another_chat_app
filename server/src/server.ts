@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import * as usersController from './controllers/usersController';
 import io from './socket/socket';
 import mongoose from 'mongoose';
-import messageModel from './models/messageModel';
 
 const app = express();
 const server = http.createServer(app);
@@ -57,11 +56,6 @@ io.attach(server);
 app.get('/', (req, res) => {
   console.log('Here');
   res.status(500).send('Hi');
-});
-
-app.get('/test', (req, res) => {
-  messageModel.testSave();
-  res.send();
 });
 
 app.post('/register', usersController.register);
