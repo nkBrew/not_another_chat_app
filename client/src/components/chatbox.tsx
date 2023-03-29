@@ -16,7 +16,6 @@ const Chatbox = () => {
     if (value.length === 0) {
       return;
     }
-    // socket?.emit('message', { from: socket.id, to: room, content: value });
     socket?.emit('message', {
       fromUserId: user?.userId,
       conversationId,
@@ -26,14 +25,17 @@ const Chatbox = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        className="w-full h-full"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <input type="submit" hidden />
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          className="w-full h-full p-2 rounded-lg outline-none bg-zinc-700"
+          value={value}
+          placeholder={'Say Something!'}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <input type="submit" hidden />
+      </form>
+    </div>
   );
 };
 

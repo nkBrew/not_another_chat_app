@@ -17,10 +17,11 @@ export const saveMessage = async (message: NewMessage) => {
     return;
   }
 
-  const data = new MessageModel({ ...message, timestamp: Date.now() });
+  const msg: Message = { ...message, timestamp: Date.now() };
+  const data = new MessageModel(msg);
   data.save();
 
-  return message;
+  return msg;
 };
 
 export const getConversationById = async (id: string) => {

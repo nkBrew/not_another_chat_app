@@ -17,14 +17,28 @@ const PMPage = ({ params }: { params: { id: string } }) => {
     socket?.emit('get_messages', conversationId);
   }, []);
 
+  Date.now().toLocaleString();
+
+  const formatDate = (timestamp: number) => {
+    const now = Date.now();
+    console.log(timestamp);
+    let display = '';
+    if (Math.round((now - timestamp) / (1000 * 60 * 60 * 24)) > 1) {
+      display = display.concat(`${new Date(timestamp).toLocaleDateString()} `);
+    }
+    display = display.concat(new Date(timestamp).toLocaleTimeString());
+    return display;
+  };
   return (
-    <div className="overflow-y-auto overflow-x-hidden h-full">
+    <div className="h-full ">
       <div className="px-10 py-3">
         {conversationMessages &&
           conversationMessages.map((msg, i) => (
             <div className="mt-2" key={`msg-${i}`}>
-              {/* <h3>{su.username}</h3> */}
-              <h3>{others.get(msg.fromUserId)?.username}</h3>
+              <div className="flex">
+                <h3 className="pr-8">{others.get(msg.fromUserId)?.username}</h3>
+                <div>{formatDate(msg.timestamp)}</div>
+              </div>
               <div>{msg.content}</div>
             </div>
           ))}

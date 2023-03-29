@@ -120,7 +120,10 @@ io.on('connection', async (socket) => {
       `message from: ${msg.fromUserId} to: ${msg.conversationId} content: ${msg.content}`,
     );
 
-    messageController.saveMessage(msg).then(async () => {
+    messageController.saveMessage(msg).then(async (msg) => {
+      if (!msg) {
+        return;
+      }
       const conversation = await messageController.getConversationById(
         msg.conversationId,
       );

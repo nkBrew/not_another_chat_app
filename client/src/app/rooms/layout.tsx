@@ -4,14 +4,14 @@ import React from 'react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen text-gray-300">
       <RoomChoice />
-      <div className="bg-navy-light w-full flex flex-col max-h-screen">
-        <div className="h-5/6">
+      <div className="w-full bg-zinc-800  flex flex-col max-h-screen text-gray-300">
+        <div className="h-full overflow-y-scroll scrollbar">
           {children}
           {/* <div className="max-h-full">{children}</div> */}
         </div>
-        <div className="bg-red-200 w-full h-1/6">
+        <div className="w-full">
           <div className="p-3 h-full">
             <Chatbox />
           </div>

@@ -2,10 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  height:100vh;
+
+@layer base {
+  h3 {
+    @apply text-xl
+  }
 }
 
-main {
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 7px;
+  }
 
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    margin: 10px 0;
+    background: #18181b;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: gray;
+    border-radius: 100vh;
+    border: 1px solid #18181b;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9;
+  }
 }

@@ -48,8 +48,6 @@ const RoomChoice = () => {
 
     socket.on('rooms', (msg: CreateRoomResponse) => {
       console.log(msg);
-      //First index is socketID
-      // setRooms([...msg.rooms.slice(1, msg.rooms.length)]);
       setRooms([...msg.rooms]);
     });
 
@@ -91,7 +89,7 @@ const RoomChoice = () => {
 
   // console.log(`others: `);
   return (
-    <div className="h-full bg-red-500">
+    <div className="bg-zinc-700 w-40 min-h-full">
       <CreateRoomModal
         show={showCreateRoomModal}
         setShow={setShowCreateRoomModal}
@@ -113,29 +111,32 @@ const RoomChoice = () => {
           Join room
         </button>
         {/* {Array.from(socketUsers.values()).map((su, i) => ( */}
-        {Array.from(conversations.values()).map((convo, i) => (
-          <div key={`convo-${i}`}>
-            <Link
-              href={`/rooms/pm/${convo.conversationId}`}
-              onClick={() => setConversationId(convo.conversationId)}
-            >
-              <div className="bg-purple-500 m-3 rounded-full h-28">
-                {/* {su.username} */}
-                {convo.memberIds
-                  .filter(
-                    (id) => id !== user?.userId || convo.memberIds.length === 1,
-                  )
-                  .map((userId, j) => (
-                    <div key={j}>
-                      {`${others.get(userId)?.username}${
-                        userId === user?.userId ? ' (You)' : ''
-                      }`}
-                    </div>
-                  ))}
-              </div>
-            </Link>
-          </div>
-        ))}
+        <ul className="p-1">
+          {Array.from(conversations.values()).map((convo, i) => (
+            <li key={`convo-${i}`} className="hover:bg-zinc-600 p-3 rounded-md">
+              <Link
+                href={`/rooms/pm/${convo.conversationId}`}
+                onClick={() => setConversationId(convo.conversationId)}
+              >
+                <h3 className="">
+                  {/* {su.username} */}
+                  {convo.memberIds
+                    .filter(
+                      (id) =>
+                        id !== user?.userId || convo.memberIds.length === 1,
+                    )
+                    .map((userId, j) => (
+                      <div key={j}>
+                        {`${others.get(userId)?.username}${
+                          userId === user?.userId ? ' (You)' : ''
+                        }`}
+                      </div>
+                    ))}
+                </h3>
+              </Link>
+            </li>
+          ))}
+        </ul>
         {/* {rooms.map((r, i) => (
           // <button
           //   className="bg-white m-3 rounded-full h-28"
