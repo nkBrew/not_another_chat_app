@@ -1,0 +1,59 @@
+import useUserStore from '@/store/userStore';
+import io from 'socket.io-client';
+import Router from 'next/router';
+import {
+  ConversationDto,
+  CreateRoomResponse,
+  Message,
+  UserBasic,
+} from '@not-another-chat-app/common';
+import useMessageStore from '@/store/messageStore';
+import useOthersStore from '@/store/othersStore';
+import usePMStore from '@/store/pmStore';
+
+const socket = io('http://localhost:3001', {
+  // withCredentials: true,
+  // query: { token: 'feafe' },
+  query: { token: useUserStore.getState().user?.accessToken },
+});
+
+socket.on('connect_error', (err) => {
+  console.log(err);
+  Router.push('/');
+});
+
+socket.on('rooms', (msg: CreateRoomResponse) => {
+  console.log(msg);
+  // ussetRooms([...msg.rooms]);
+});
+
+socket.on('message', (msg: Message) => {
+  console.log(`got message: ${msg}`);
+
+  useMessageStore.getState().setMessages(msg.conversationId, [msg]);
+});
+
+socket.on('messages', (msgs: Message[]) => {
+  console.log(`got message: ${msgs}`);
+
+  if (!msgs || msgs.length < 1) {
+    return;
+  }
+  useMessageStore.getState().setMessages(msgs[0].conversationId, msgs);
+});
+
+socket.on('users_testnew', (data: UserBasic[]) => {
+  console.log(data);
+  useOthersStore.getState().setOthers(data);
+});
+
+socket.on('pm_conversations', (data: ConversationDto[]) => {
+  console.log(data);
+  usePMStore.getState().setConversations(data);
+});
+
+socket.on('user_connected', (user: UserBasic) => {
+  useOthersStore.getState().setOther(user);
+});
+
+export default socket;

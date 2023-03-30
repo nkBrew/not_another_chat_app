@@ -1,104 +1,62 @@
 'use client';
-import { test } from '@/apis/backend';
 import usePMStore from '@/store/pmStore';
 import useMessageStore from '@/store/messageStore';
 import useSocketStore from '@/store/socketStore';
 import useUserStore from '@/store/userStore';
-import {
-  ConversationDto,
-  CreateRoomResponse,
-  Message,
-  SocketUser,
-  UserBasic,
-} from '@not-another-chat-app/common';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
 import CreateRoomModal from './createRoom';
 import JoinRoomModal from './joinRoomModal';
 import useOthersStore from '@/store/othersStore';
-import useSocketUsersStore from '@/store/socketUsersStore';
+import socket from '@/apis/socket';
+import { FiLogOut } from 'react-icons/fi';
+import { IconContext } from 'react-icons';
+import { useRouter } from 'next/navigation';
 
 const RoomChoice = () => {
-  const [rooms, setRooms] = useState<string[]>([]);
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
-  const [x, setX] = useState(0);
-  const setSocket = useSocketStore((state) => state.setSocket);
-  const { conversationId, setMessages, setConversationId } = useMessageStore(
-    (state) => state,
-  );
-  const { socketUsers, setSocketUsers } = useSocketUsersStore((state) => state);
-  const user = useUserStore((state) => state.user);
+  const { setSocket } = useSocketStore((state) => state);
+  const { setConversationId } = useMessageStore((state) => state);
+  const { user, logout } = useUserStore((state) => state);
+  const { conversations } = usePMStore((state) => state);
+  const { others } = useOthersStore((state) => state);
   const router = useRouter();
-  const { conversations, setConversations } = usePMStore((state) => state);
-  const { others, setOthers } = useOthersStore((state) => state);
+
   useEffect(() => {
     console.log('eeeee: ', user?.accessToken);
-    const socket = io('http://localhost:3001', {
-      // withCredentials: true,
-      // query: { token: 'feafe' },
-      query: { token: user?.accessToken },
-    });
-    socket.on('connect_error', (err) => {
-      console.log(err);
-      router.push('/');
-    });
+    socket.connect();
 
-    socket.on('rooms', (msg: CreateRoomResponse) => {
-      console.log(msg);
-      setRooms([...msg.rooms]);
+    socket.on('connect', () => {
+      setSocket(socket);
     });
-
-    socket.on('users', (socketUsers: SocketUser[]) => {
-      console.log(socketUsers);
-      setSocketUsers(socketUsers);
-    });
-
-    socket.on('message', (msg: Message) => {
-      console.log(`got message: ${msg}`);
-
-      setMessages(msg.conversationId, [msg]);
-    });
-
-    socket.on('messages', (msgs: Message[]) => {
-      console.log(`got message: ${msgs}`);
-
-      if (!msgs || msgs.length < 1) {
-        return;
-      }
-      setMessages(msgs[0].conversationId, msgs);
-    });
-
-    socket.on('users_testnew', (data: UserBasic[]) => {
-      console.log(data);
-      setOthers(data);
-    });
-
-    socket.on('pm_conversations', (data: ConversationDto[]) => {
-      console.log(data);
-      setConversations(data);
-    });
-    setSocket(socket);
     return () => {
       socket.off('connect');
       socket.off('disconnect');
     };
   }, []);
 
-  // console.log(`others: `);
+  const onLogoutClick = () => {
+    logout();
+    socket.disconnect();
+    router.push('/');
+  };
+
   return (
-    <div className="bg-zinc-700 w-40 min-h-full">
-      <CreateRoomModal
+    <div className="bg-zinc-700 w-40 max-h-screen overflow-y-scroll auto scrollbar">
+      {
+        // * coming soon
+        /* <CreateRoomModal
         show={showCreateRoomModal}
         setShow={setShowCreateRoomModal}
       />
-      <JoinRoomModal show={showJoinRoomModal} setShow={setShowJoinRoomModal} />
+      <JoinRoomModal show={showJoinRoomModal} setShow={setShowJoinRoomModal} /> */
+      }
       <div className="flex flex-col">
-        <button
+        {
+          // * coming soon
+          /* <button
           className="m-3 bg-blue-300 rounded-lg"
-          //  onClick={emitCreateRoom}
           onClick={() => setShowCreateRoomModal(true)}
         >
           Create room
@@ -109,24 +67,44 @@ const RoomChoice = () => {
           onClick={() => setShowJoinRoomModal(true)}
         >
           Join room
-        </button>
-        {/* {Array.from(socketUsers.values()).map((su, i) => ( */}
+        </button> */
+        }
+
         <ul className="p-1">
+          <li className="p-3">
+            <button
+              className="flex justify-center hover:text-green-300"
+              onClick={onLogoutClick}
+            >
+              <IconContext.Provider value={{ size: '2rem' }}>
+                <FiLogOut />
+              </IconContext.Provider>
+            </button>
+          </li>
           {Array.from(conversations.values()).map((convo, i) => (
-            <li key={`convo-${i}`} className="hover:bg-zinc-600 p-3 rounded-md">
+            <li
+              key={`convo-${i}`}
+              className="hover:bg-zinc-600 p-3 rounded-md "
+            >
               <Link
                 href={`/rooms/pm/${convo.conversationId}`}
                 onClick={() => setConversationId(convo.conversationId)}
               >
-                <h3 className="">
-                  {/* {su.username} */}
+                <h3>
                   {convo.memberIds
                     .filter(
                       (id) =>
                         id !== user?.userId || convo.memberIds.length === 1,
                     )
                     .map((userId, j) => (
-                      <div key={j}>
+                      <div
+                        key={j}
+                        className={`border-r-2 ${
+                          others.get(userId)?.online
+                            ? 'border-green-400'
+                            : 'border-grey-400'
+                        }`}
+                      >
                         {`${others.get(userId)?.username}${
                           userId === user?.userId ? ' (You)' : ''
                         }`}
@@ -137,18 +115,6 @@ const RoomChoice = () => {
             </li>
           ))}
         </ul>
-        {/* {rooms.map((r, i) => (
-          // <button
-          //   className="bg-white m-3 rounded-full h-28"
-          //   key={i}
-          //   onClick={() => setRoom(r)}
-          // >
-          //   {r}
-          // </button>
-          <Link href={`/rooms/${r}`} key={i} onClick={() => setRoom(r)}>
-            <div className="bg-white m-3 rounded-full h-28">{r}</div>
-          </Link>
-        ))} */}
       </div>
     </div>
   );

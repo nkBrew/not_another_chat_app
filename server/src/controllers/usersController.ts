@@ -6,6 +6,7 @@ import { TypedRequest } from '../types';
 import bcrypt from 'bcrypt';
 import * as messageController from './messageController';
 import { ConversationDto, UserBasic } from '@not-another-chat-app/common';
+import { findUserSessionByUserId } from './userSessionController';
 
 export const login = (
   req: TypedRequest<{ email: string; password: string }>,
@@ -45,8 +46,15 @@ export const findUser = (username: string) => {
   return users.findUser(username);
 };
 
-export const findUserById = (id: string) => {
-  return users.findUserById(id);
+export const findUserById = async (id: string) => {
+  const doc = await UsersModel.findById(id);
+  if (!doc) {
+    return undefined;
+  }
+  const { id: userId, username } = doc;
+  const online = !!!!findUserSessionByUserId(userId);
+  const user: UserBasic = { userId: userId, username, online };
+  return user;
 };
 
 export interface UserDto {
@@ -57,10 +65,16 @@ export interface UserDto {
 
 export const getUsers = async () => {
   const userDocs = await UsersModel.find();
-  const users: UserBasic[] = userDocs.map((doc) => ({
-    userId: doc.id,
-    username: doc.username,
-  }));
+  const users: UserBasic[] = userDocs.map((doc) => {
+    const userId = doc.id;
+    const online = !!findUserSessionByUserId(userId);
+    return {
+      userId: doc.id,
+      username: doc.username,
+      online,
+    };
+  });
+
   return users;
 };
 

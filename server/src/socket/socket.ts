@@ -19,6 +19,7 @@ interface ServerToClientEvents {
   users_testnew: (users: UserBasic[]) => void;
   pm_conversations: (conversations: ConversationDto[]) => void;
   messages: (msgs: Message[]) => void;
+  user_connected: (user: UserBasic) => void;
 }
 
 interface SocketIOResponse {
@@ -141,12 +142,9 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('get_messages', (conversationId) => {
-    console.log('got here');
     messageController
       .getMessagesByConversationId(conversationId)
       .then((foundMessages) => {
-        // console.log('then got here', foundMessages);
-        // console.log(foundMessages);
         io.to(socket.id).emit('messages', foundMessages);
       });
   });
@@ -167,6 +165,7 @@ io.on('connection', async (socket) => {
     socket.emit('pm_conversations', conversations);
   });
 
+  io.emit('user_connected', { ...user, online: true });
   // socket.join('testroom');
   console.log(rooms);
 });

@@ -11,6 +11,7 @@ export interface User {
 export interface UserState {
   user?: User;
   setUser: ({ userId, username, accessToken }: User) => void;
+  logout: () => void;
 }
 
 const useUserStore = create<UserState>()(
@@ -19,6 +20,7 @@ const useUserStore = create<UserState>()(
       (set) => ({
         user: undefined,
         setUser: (u: User) => set({ user: u }),
+        logout: () => set({ user: undefined }),
       }),
       {
         name: 'user-storage',

@@ -31,4 +31,5 @@ export interface ConversationDto {
 export interface UserBasic {
   userId: string;
   username: string;
+  online: boolean;
 }
