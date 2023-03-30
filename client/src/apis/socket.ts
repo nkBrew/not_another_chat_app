@@ -52,7 +52,7 @@ socket.on('pm_conversations', (data: ConversationDto[]) => {
   usePMStore.getState().setConversations(data);
 });
 
-socket.on('user_connected', (user: UserBasic) => {
+socket.on('update_user', (user: UserBasic) => {
   useOthersStore.getState().setOther(user);
 });
 

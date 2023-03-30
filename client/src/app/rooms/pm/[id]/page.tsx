@@ -30,7 +30,7 @@ const PMPage = ({ params }: { params: { id: string } }) => {
     return display;
   };
   return (
-    <div className="h-full ">
+    <div className="h-full max-w-full ">
       <div className="px-10 py-3">
         {conversationMessages &&
           conversationMessages.map((msg, i) => (
@@ -39,7 +39,7 @@ const PMPage = ({ params }: { params: { id: string } }) => {
                 <h3 className="pr-8">{others.get(msg.fromUserId)?.username}</h3>
                 <div>{formatDate(msg.timestamp)}</div>
               </div>
-              <div>{msg.content}</div>
+              <div className="break-words">{msg.content}</div>
             </div>
           ))}
       </div>

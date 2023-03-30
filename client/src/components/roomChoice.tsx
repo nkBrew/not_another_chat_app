@@ -82,15 +82,12 @@ const RoomChoice = () => {
             </button>
           </li>
           {Array.from(conversations.values()).map((convo, i) => (
-            <li
-              key={`convo-${i}`}
-              className="hover:bg-zinc-600 p-3 rounded-md "
-            >
+            <li key={`convo-${i}`}>
               <Link
                 href={`/rooms/pm/${convo.conversationId}`}
                 onClick={() => setConversationId(convo.conversationId)}
               >
-                <h3>
+                <h3 className="hover:bg-zinc-600 p-3 rounded-md ">
                   {convo.memberIds
                     .filter(
                       (id) =>

@@ -19,7 +19,7 @@ interface ServerToClientEvents {
   users_testnew: (users: UserBasic[]) => void;
   pm_conversations: (conversations: ConversationDto[]) => void;
   messages: (msgs: Message[]) => void;
-  user_connected: (user: UserBasic) => void;
+  update_user: (user: UserBasic) => void;
 }
 
 interface SocketIOResponse {
@@ -151,8 +151,8 @@ io.on('connection', async (socket) => {
 
   socket.on('disconnect', (reason, description) => {
     console.log(`Socket: ${socket.id} disconnected`);
-    socketUsers.delete(socket.id);
-    userSessionController.deleteUserSession(socket.id);
+    userSessionController.deleteUserSession(userId);
+    io.emit('update_user', { ...user, online: false });
   });
 
   //Get users
@@ -165,7 +165,7 @@ io.on('connection', async (socket) => {
     socket.emit('pm_conversations', conversations);
   });
 
-  io.emit('user_connected', { ...user, online: true });
+  io.emit('update_user', { ...user, online: true });
   // socket.join('testroom');
   console.log(rooms);
 });
