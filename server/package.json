@@ -1,7 +1,10 @@
 {
   "name": "not-another-chat-app-server",
   "scripts": {
-    "dev": "nodemon --delay 500ms ./src/server.ts"
+    "dev": "nodemon --delay 500ms ./src/server.ts",
+    "build": "tsc",
+    "start": "node build/server.js",
+    "prestart" : "npm run build"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
