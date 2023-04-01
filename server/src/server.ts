@@ -1,7 +1,6 @@
 import cors from 'cors';
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
-import session from 'express-session';
 import http from 'http';
 import jwt from 'jsonwebtoken';
 import * as usersController from './controllers/usersController';
@@ -11,29 +10,39 @@ import mongoose from 'mongoose';
 const app = express();
 const server = http.createServer(app);
 
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-});
 app.use(
-  sessionMiddleware,
   cors({
     origin: 'http://localhost:3000',
-    credentials: true,
   }),
 );
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/test');
+// mongoose.connect('mongodb://localhost:27017/test');
+// const db = mongoose.connection;
+// db.on('error', (error) => {
+//   console.log(error);
+// });
+
+const dbURL = process.env.MONGODB_URL;
+const credentials = `${__dirname}/auth.pem`;
+// mongoose.connect(dbURL, {
+//   sslKey: credentials,
+//   sslCert: credentials,
+//   // serverApi: ServerApiVersion.v1
+// });
+
+// console.log(
+//   `mongodb+srv://${process.env.MONGODB_URL}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
+// );
+mongoose.connect(
+  `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
+);
+
 const db = mongoose.connection;
-db.on('error', (error) => {
-  console.log(error);
-});
 
 db.once('connected', () => console.log('Connected to database'));
 
-const authenticateJWt = (req: Request, res: Response, next: NextFunction) => {
+const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
@@ -60,15 +69,6 @@ app.get('/', (req, res) => {
 
 app.post('/register', usersController.register);
 app.post('/login', usersController.login);
-
-app.get('/logout', (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    return res.send();
-  });
-});
 
 console.log('Server Started');
 server.listen(3001);

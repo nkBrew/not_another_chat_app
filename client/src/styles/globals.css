@@ -7,6 +7,14 @@
   h3 {
     @apply text-xl
   }
+
+  h2 {
+    @apply text-3xl mb-3 font-semibold
+  }
+  
+  section {
+    @apply py-4
+  }
 }
 
 @layer utilities {

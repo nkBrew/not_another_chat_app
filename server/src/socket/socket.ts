@@ -33,7 +33,7 @@ interface ClientToServerEvents {
     callback: (response: SocketIOResponse) => void,
   ) => void;
   leaveRoom: (name: string) => void;
-  message: (msg: Message) => void;
+  message: (msg: NewMessage) => void;
   get_messages: (conversationId: string) => void;
 }
 

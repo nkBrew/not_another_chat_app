@@ -43,7 +43,7 @@ const RoomChoice = () => {
   };
 
   return (
-    <div className="bg-zinc-700 w-40 max-h-screen overflow-y-scroll auto scrollbar">
+    <div className="bg-zinc-700 w-40 h-full">
       {
         // * coming soon
         /* <CreateRoomModal
@@ -111,6 +111,9 @@ const RoomChoice = () => {
               </Link>
             </li>
           ))}
+          {/* {Array.from(Array(40).keys()).map(() => (
+            <h3>hi</h3>
+          ))} */}
         </ul>
       </div>
     </div>

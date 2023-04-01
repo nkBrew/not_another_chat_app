@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen h-screen min-w-screen w-screen bg-zinc-700">
+      <body className="min-h-screen h-screen min-w-screen w-screen bg-zinc-800">
         <Suspense fallback={<Loading />}>{children}</Suspense>
       </body>
     </html>
