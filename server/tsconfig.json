@@ -13,8 +13,8 @@
     "isolatedModules": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "incremental": true,
+    "baseUrl": ".",
     "outDir": "./build"
-    // "baseUrl": "."
   },
   "include": ["src/**/*.ts", "environment.d.ts"],
   "exclude": ["node_modules"],
