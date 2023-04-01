@@ -42,23 +42,23 @@ const db = mongoose.connection;
 
 db.once('connected', () => console.log('Connected to database'));
 
-const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) {
-    return res.sendStatus(401);
-  }
-  //userid
-  jwt.verify(token, process.env.SESSION_SECRET, (err, user) => {
-    if (err) {
-      return res.sendStatus(403);
-    }
-    console.log('jwt user: ', user);
-    //Maybe change
-    req.user = { id: user as string };
-    next();
-  });
-};
+// const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+//   const authHeader = req.headers.authorization;
+//   const token = authHeader && authHeader.split(' ')[1];
+//   if (!token) {
+//     return res.sendStatus(401);
+//   }
+//   //userid
+//   jwt.verify(token, process.env.SESSION_SECRET, (err, user) => {
+//     if (err) {
+//       return res.sendStatus(403);
+//     }
+//     console.log('jwt user: ', user);
+//     //Maybe change
+//     req.user = { id: user as string };
+//     next();
+//   });
+// };
 
 io.attach(server);
 
