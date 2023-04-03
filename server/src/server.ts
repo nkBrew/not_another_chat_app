@@ -71,4 +71,6 @@ app.post('/register', usersController.register);
 app.post('/login', usersController.login);
 
 console.log('Server Started');
-server.listen(3001);
+// server.listen(3001);
+console.log(process.env.PORT);
+server.listen(`0.0.0.0:${process.env.PORT}`);
