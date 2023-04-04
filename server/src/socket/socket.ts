@@ -53,12 +53,7 @@ const io = new Server<
   ServerToClientEvents,
   object,
   SocketData
->({
-  cors: {
-    origin: ['*'],
-    credentials: true,
-  },
-});
+>();
 
 const socketUsers = new Map<string, SocketUser>();
 
