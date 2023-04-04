@@ -34,9 +34,7 @@ const credentials = `${__dirname}/auth.pem`;
 // console.log(
 //   `mongodb+srv://${process.env.MONGODB_URL}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
 // );
-mongoose.connect(
-  `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
-);
+mongoose.connect(process.env.MONGODB_URL);
 
 const db = mongoose.connection;
 
