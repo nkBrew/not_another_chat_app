@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 
 const app = express();
 const server = http.createServer(app);
+const port = process.env.PORT || 3001;
 
 app.use(
   cors({
@@ -70,5 +71,9 @@ app.post('/login', usersController.login);
 
 console.log('Server Started');
 // server.listen(3001);
-console.log(process.env.PORT);
-server.listen(`0.0.0.0:${process.env.PORT}`);
+console.log(port);
+// server.listen(`0.0.0.0:${process.env.PORT}`);
+
+server.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`);
+});
