@@ -9,7 +9,8 @@
     "dev": "npm run dev --workspace=server",
     "start:server": "npm run build --workspace=common && npm run start --workspace=server",
     "build:client": "npm run build --workspace=common && npm run build --workspace=client",
-    "build:common": "npm run build --workspace=common"
+    "build:common": "npm run build --workspace=common",
+    "preinstall": "npm run build --workspace=common"
   },
   "dependencies": {
     "@not-another-chat-app/common": "1.0.0"
