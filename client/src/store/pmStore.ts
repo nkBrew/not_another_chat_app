@@ -17,6 +17,7 @@ interface PMConversation {
 interface PMState {
   conversations: Map<string, PMConversation>;
   setConversations: (c: PMConversation[]) => void;
+  removeConversations: () => void;
 }
 
 const usePMStore = create<PMState>()(
@@ -27,6 +28,7 @@ const usePMStore = create<PMState>()(
         set({
           conversations: new Map(convos.map((c) => [c.conversationId, c])),
         }),
+      removeConversations: () => set({ conversations: new Map() }),
     }),
     {
       ...config,

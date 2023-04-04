@@ -12,50 +12,54 @@ import useOthersStore from '@/store/othersStore';
 import usePMStore from '@/store/pmStore';
 
 // const socket = io('http://localhost:3001', {
-const socket = io('https://notanotherchatapp-production.up.railway.app/', {
-  // withCredentials: true,
-  // query: { token: 'feafe' },
-  query: { token: useUserStore.getState().user?.accessToken },
-  autoConnect: false,
-});
 
-socket.on('connect_error', (err) => {
-  console.log(err);
-  Router.push('/');
-});
+const socketInit = () => {
+  const socket = io('https://notanotherchatapp-production.up.railway.app/', {
+    // withCredentials: true,
+    // query: { token: 'feafe' },
+    query: { token: useUserStore.getState().user?.accessToken },
+    autoConnect: false,
+  });
 
-socket.on('rooms', (msg: CreateRoomResponse) => {
-  console.log(msg);
-  // ussetRooms([...msg.rooms]);
-});
+  socket.on('connect_error', (err) => {
+    console.log(err);
+    Router.push('/');
+  });
 
-socket.on('message', (msg: Message) => {
-  console.log(`got message: ${msg}`);
+  socket.on('rooms', (msg: CreateRoomResponse) => {
+    console.log(msg);
+    // ussetRooms([...msg.rooms]);
+  });
 
-  useMessageStore.getState().setMessages(msg.conversationId, [msg]);
-});
+  socket.on('message', (msg: Message) => {
+    console.log(`got message: ${msg}`);
 
-socket.on('messages', (msgs: Message[]) => {
-  console.log(`got message: ${msgs}`);
+    useMessageStore.getState().setMessages(msg.conversationId, [msg]);
+  });
 
-  if (!msgs || msgs.length < 1) {
-    return;
-  }
-  useMessageStore.getState().setMessages(msgs[0].conversationId, msgs);
-});
+  socket.on('messages', (msgs: Message[]) => {
+    console.log(`got message: ${msgs}`);
 
-socket.on('users_testnew', (data: UserBasic[]) => {
-  console.log(data);
-  useOthersStore.getState().setOthers(data);
-});
+    if (!msgs || msgs.length < 1) {
+      return;
+    }
+    useMessageStore.getState().setMessages(msgs[0].conversationId, msgs);
+  });
 
-socket.on('pm_conversations', (data: ConversationDto[]) => {
-  console.log(data);
-  usePMStore.getState().setConversations(data);
-});
+  socket.on('users_testnew', (data: UserBasic[]) => {
+    console.log(data);
+    useOthersStore.getState().setOthers(data);
+  });
 
-socket.on('update_user', (user: UserBasic) => {
-  useOthersStore.getState().setOther(user);
-});
+  socket.on('pm_conversations', (data: ConversationDto[]) => {
+    console.log(data);
+    usePMStore.getState().setConversations(data);
+  });
 
-export default socket;
+  socket.on('update_user', (user: UserBasic) => {
+    useOthersStore.getState().setOther(user);
+  });
+  return socket;
+};
+
+export default socketInit;

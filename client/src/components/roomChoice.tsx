@@ -8,29 +8,31 @@ import React, { useEffect, useState } from 'react';
 import CreateRoomModal from './createRoom';
 import JoinRoomModal from './joinRoomModal';
 import useOthersStore from '@/store/othersStore';
-import socket from '@/apis/socket';
 import { FiLogOut } from 'react-icons/fi';
 import { IconContext } from 'react-icons';
 import { useRouter } from 'next/navigation';
+import socketInit from '@/apis/socket';
 
 const RoomChoice = () => {
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
-  const { setSocket } = useSocketStore((state) => state);
+  const { setSocket, removeSocket } = useSocketStore((state) => state);
   const { setConversationId } = useMessageStore((state) => state);
   const { user, logout } = useUserStore((state) => state);
-  const { conversations } = usePMStore((state) => state);
+  const { conversations, removeConversations } = usePMStore((state) => state);
   const { others } = useOthersStore((state) => state);
   const router = useRouter();
 
   useEffect(() => {
     console.log('eeeee: ', user?.accessToken);
+    const socket = socketInit();
     socket.connect();
 
     socket.on('connect', () => {
       setSocket(socket);
     });
     return () => {
+      socket.disconnect();
       socket.off('connect');
       socket.off('disconnect');
     };
@@ -38,7 +40,9 @@ const RoomChoice = () => {
 
   const onLogoutClick = () => {
     logout();
-    socket.disconnect();
+    // socket.disconnect();
+    removeSocket();
+    removeConversations();
     router.push('/');
   };
 

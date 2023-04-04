@@ -21,20 +21,20 @@ app.use(express.json());
 
 // mongoose.connect('mongodb://localhost:27017/test');
 // const db = mongoose.connection;
-// db.on('error', (error) => {
-//   console.log(error);
-// });
 
-const dbURL = process.env.MONGODB_URL;
-const credentials = `${__dirname}/auth.pem`;
+const dbURL = process.env.MONGODB_URL || 'localhost:27017/test';
 
+// const credentials = `${__dirname}/auth.pem`;
 // console.log(
 //   `mongodb+srv://${process.env.MONGODB_URL}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
 // );
-mongoose.connect(process.env.MONGODB_URL);
+mongoose.connect(dbURL);
 
 const db = mongoose.connection;
 
+db.on('error', (error) => {
+  console.log(error);
+});
 db.once('connected', () => console.log('Connected to database'));
 
 // const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
