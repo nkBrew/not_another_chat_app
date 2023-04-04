@@ -116,7 +116,7 @@ export default function Home() {
                 className="bg-green-600 hover:bg-green-800 py-2 px-4 rounded-lg"
               >
                 <span className="pr-2">Check Out the Repo</span>
-                <FiGithub className="inline" />
+                <FiGithub />
               </Link>
             </div>
           </section>

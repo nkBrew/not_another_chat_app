@@ -11,7 +11,8 @@ import useMessageStore from '@/store/messageStore';
 import useOthersStore from '@/store/othersStore';
 import usePMStore from '@/store/pmStore';
 
-const socket = io('http://localhost:3001', {
+// const socket = io('http://localhost:3001', {
+const socket = io('https://notanotherchatapp-production.up.railway.app/', {
   // withCredentials: true,
   // query: { token: 'feafe' },
   query: { token: useUserStore.getState().user?.accessToken },
