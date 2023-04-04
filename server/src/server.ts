@@ -65,6 +65,11 @@ app.get('/', (req, res) => {
 app.post('/register', usersController.register);
 app.post('/login', usersController.login);
 
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.log('Error Handling Middleware called');
+  console.log('Path: ', req.path);
+  console.error('Error: ', error);
+});
 console.log('Server Started');
 console.log(port);
 
