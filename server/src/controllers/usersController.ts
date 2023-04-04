@@ -97,5 +97,8 @@ export const register = async (
 
   console.log(`New user created ${document.id}`);
   messageController.createConversationsForNewUser(document.id);
-  return res.sendStatus(201);
+
+  const token = jwt.sign(document.id, process.env.SESSION_SECRET);
+  const user = { userId: document.id, username, accessToken: token };
+  return res.status(201).json(user);
 };

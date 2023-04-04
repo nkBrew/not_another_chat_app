@@ -1,18 +1,23 @@
 'use client';
 import { register } from '@/apis/backend';
+import useUserStore, { User } from '@/store/userStore';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 const Register = () => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
+  const { user, setUser } = useUserStore((state) => state);
+  const router = useRouter();
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     register(userName, password)
-      .then((data) => {
-        console.log('registered');
+      .then((data: User) => {
+        console.log('registered:', data);
+        setUser(data);
+        router.push('/rooms');
       })
       .catch((err) => {
         console.log(err);
