@@ -16,6 +16,7 @@ const socket = io('https://notanotherchatapp-production.up.railway.app/', {
   // withCredentials: true,
   // query: { token: 'feafe' },
   query: { token: useUserStore.getState().user?.accessToken },
+  autoConnect: false,
 });
 
 socket.on('connect_error', (err) => {
