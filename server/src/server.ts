@@ -14,6 +14,7 @@ const port = process.env.PORT || 3001;
 app.use(
   cors({
     origin: 'http://localhost:3000',
+    methods: ['GET, POST'],
   }),
 );
 app.use(express.json());
@@ -26,11 +27,6 @@ app.use(express.json());
 
 const dbURL = process.env.MONGODB_URL;
 const credentials = `${__dirname}/auth.pem`;
-// mongoose.connect(dbURL, {
-//   sslKey: credentials,
-//   sslCert: credentials,
-//   // serverApi: ServerApiVersion.v1
-// });
 
 // console.log(
 //   `mongodb+srv://${process.env.MONGODB_URL}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
@@ -70,9 +66,7 @@ app.post('/register', usersController.register);
 app.post('/login', usersController.login);
 
 console.log('Server Started');
-// server.listen(3001);
 console.log(port);
-// server.listen(`0.0.0.0:${process.env.PORT}`);
 
 server.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
