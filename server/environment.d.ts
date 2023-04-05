@@ -2,7 +2,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       SESSION_SECRET: string;
-      MONGODB_URL: string;
+      MONGO_URL: string;
       MONGODB_USERNAME: string;
       MONGODB_PASSWORD: string;
     }

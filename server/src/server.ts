@@ -19,7 +19,7 @@ app.use(
 );
 app.use(express.json());
 
-const dbURL = process.env.MONGODB_URL || 'mongodb://localhost:27017/test';
+const dbURL = process.env.MONGO_URL || 'mongodb://localhost:27017/test';
 
 mongoose.connect(dbURL);
 
