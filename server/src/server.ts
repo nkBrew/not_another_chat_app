@@ -25,6 +25,8 @@ mongoose.connect(dbURL);
 
 const db = mongoose.connection;
 
+console.log(dbURL);
+
 db.on('error', (error) => {
   console.log(error);
 });
