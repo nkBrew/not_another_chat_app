@@ -10,11 +10,10 @@ import {
 import useMessageStore from '@/store/messageStore';
 import useOthersStore from '@/store/othersStore';
 import usePMStore from '@/store/pmStore';
-
-const BACKEND_URL = process.env.BACKED_URL || 'http://localhost:3001';
+import { baseURL } from './config';
 
 const socketInit = () => {
-  const socket = io(BACKEND_URL, {
+  const socket = io(baseURL, {
     query: { token: useUserStore.getState().user?.accessToken },
     autoConnect: false,
   });

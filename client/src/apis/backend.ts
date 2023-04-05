@@ -1,8 +1,8 @@
 import useUserStore from '@/store/userStore';
 import axios from 'axios';
+import { baseURL } from './config';
 
-const baseURL = process.env.BACKEND_URL || 'http://localhost:3001';
-
+console.log('Baseurl: ', baseURL);
 const api = axios.create({
   baseURL,
 });
