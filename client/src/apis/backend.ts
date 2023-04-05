@@ -1,9 +1,11 @@
 import useUserStore from '@/store/userStore';
 import axios from 'axios';
 
+const baseURL = process.env.BACKEND_URL || 'http://localhost:3001';
+
 const api = axios.create({
   // baseURL: 'http://localhost:3001',
-  baseURL: 'https://notanotherchatapp-production.up.railway.app',
+  baseURL,
 });
 
 //JWT

@@ -19,15 +19,8 @@ app.use(
 );
 app.use(express.json());
 
-// mongoose.connect('mongodb://localhost:27017/test');
-// const db = mongoose.connection;
+const dbURL = process.env.MONGODB_URL || 'mongodb://localhost:27017/test';
 
-const dbURL = process.env.MONGODB_URL || 'localhost:27017/test';
-
-// const credentials = `${__dirname}/auth.pem`;
-// console.log(
-//   `mongodb+srv://${process.env.MONGODB_URL}:${process.env.MONGODB_PASSWORD}@not-another-chat-app.0herwk8.mongodb.net/?retryWrites=true&w=majority`,
-// );
 mongoose.connect(dbURL);
 
 const db = mongoose.connection;
@@ -57,11 +50,6 @@ db.once('connected', () => console.log('Connected to database'));
 
 io.attach(server);
 
-app.get('/', (req, res) => {
-  console.log('Here');
-  res.status(500).send('Hi');
-});
-
 app.post('/register', usersController.register);
 app.post('/login', usersController.login);
 
@@ -70,6 +58,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   console.log('Path: ', req.path);
   console.error('Error: ', error);
 });
+
 console.log('Server Started');
 console.log(port);
 

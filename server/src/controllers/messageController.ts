@@ -81,13 +81,3 @@ export const createConversationsForNewUser = async (newUserId: string) => {
   }));
   ConversationModel.insertMany(pmConversations);
 };
-
-// const getMatchingUserConversations = async (userIds: string[]) => {
-//   const documents = await ConversationModel.find({ members: { $in: userIds } });
-//   const conversations = documents.map((doc) => ({
-//     conversationId: doc.id,
-//     name: doc.name,
-//     members: doc.members,
-//   }));
-//   return conversations;
-// };

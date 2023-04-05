@@ -11,12 +11,10 @@ import useMessageStore from '@/store/messageStore';
 import useOthersStore from '@/store/othersStore';
 import usePMStore from '@/store/pmStore';
 
-// const socket = io('http://localhost:3001', {
+const BACKEND_URL = process.env.BACKED_URL || 'http://localhost:3001';
 
 const socketInit = () => {
-  const socket = io('https://notanotherchatapp-production.up.railway.app/', {
-    // withCredentials: true,
-    // query: { token: 'feafe' },
+  const socket = io(BACKEND_URL, {
     query: { token: useUserStore.getState().user?.accessToken },
     autoConnect: false,
   });
@@ -28,7 +26,6 @@ const socketInit = () => {
 
   socket.on('rooms', (msg: CreateRoomResponse) => {
     console.log(msg);
-    // ussetRooms([...msg.rooms]);
   });
 
   socket.on('message', (msg: Message) => {
